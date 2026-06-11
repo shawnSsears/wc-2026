@@ -221,8 +221,24 @@
 
   footer{text-align:center;padding:32px 16px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:var(--muted);font-family:'Roboto Mono',monospace;letter-spacing:1px}
 
+  /* SYNC BAR */
+  .sync-bar{background:#0a0a09;border-bottom:1px solid rgba(255,255,255,.06);padding:6px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+  .sync-status{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+  .sync-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--muted);flex-shrink:0}
+  .sync-status.ok::before{background:#4caf50;box-shadow:0 0 6px #4caf50}
+  .sync-status.syncing::before{background:var(--gold);animation:pulse .8s infinite}
+  .sync-status.warn::before{background:#e07070}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .share-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .share-label{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;white-space:nowrap}
+  .share-input{font-family:'Roboto Mono',monospace;font-size:10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:3px;color:var(--off-white);padding:3px 8px;width:260px;max-width:40vw;cursor:text}
+  .copy-btn{font-family:'Roboto Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.3);color:var(--gold);padding:4px 10px;border-radius:3px;cursor:pointer;white-space:nowrap;transition:background .2s}
+  .copy-btn:hover{background:rgba(201,162,39,.25)}
+  .new-session-btn{font-family:'Roboto Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--muted);padding:4px 10px;border-radius:3px;cursor:pointer;white-space:nowrap;transition:background .2s}
+  .new-session-btn:hover{background:rgba(255,255,255,.1);color:var(--white)}
+
   /* TABS */
-  .tab-bar{display:flex;background:#0d0d0b;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:41px;z-index:99}
+  .tab-bar{display:flex;background:#0d0d0b;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:83px;z-index:99}
   .tab-btn{font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;padding:13px 28px;cursor:pointer;transition:color .2s,border-color .2s;flex-shrink:0}
   .tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
   .tab-btn:hover{color:var(--gold-light)}
@@ -281,6 +297,16 @@
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('schedule')" id="tab-schedule">Schedule</button>
   <button class="tab-btn" onclick="switchTab('standings')" id="tab-standings">Standings</button>
+</div>
+
+<div class="sync-bar">
+  <span class="sync-status syncing" id="sync-status">Connecting...</span>
+  <div class="share-row">
+    <span class="share-label">Share:</span>
+    <input class="share-input" id="share-url" readonly value="Loading..." onclick="this.select()">
+    <button class="copy-btn" onclick="copyShareUrl()">Copy Link</button>
+    <button class="new-session-btn" onclick="newSession()">New Session</button>
+  </div>
 </div>
 
 <div id="pane-schedule" class="tab-pane active">
@@ -1521,8 +1547,18 @@ function recomputeGroupR32(group) {
   });
 }
 
-// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
-// Safe storage wrapper -- works under file://, http://, and sandboxed iframes
+// ─── SHARED SYNC (JSONBin.io — no account, no DB) ────────────────────────────
+// JSONBin.io gives a free public REST bin. We create one on first load and store
+// its ID in localStorage so the same group always hits the same bin.
+// Anyone with the page (or who shares the bin ID) sees live updates.
+
+var BIN_ID = null;
+var LAST_SYNCED_VERSION = -1;
+var syncPollTimer = null;
+var isSyncing = false;
+var pendingSave = false;
+
+// Safe localStorage wrapper (works under file://)
 const store = (function() {
   var mem = {};
   var ls = null;
@@ -1534,56 +1570,226 @@ const store = (function() {
   };
 })();
 
-function saveState() {
-  store.set('wc2026_winners', JSON.stringify(winners));
-  store.set('wc2026_scores',  JSON.stringify(scores));
+function setSyncStatus(msg, cls) {
+  var el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'sync-status ' + (cls || '');
 }
 
-function loadState() {
-  try {
-    var savedScores = JSON.parse(store.get('wc2026_scores') || '{}');
-    Object.assign(scores, savedScores);
-
-    var saved = JSON.parse(store.get('wc2026_winners') || '{}');
-    var order = Object.keys(saved).map(Number).sort(function(a,b){return a-b;});
-    order.forEach(function(mid) {
-      var team = saved[mid];
-      var btns = document.querySelectorAll('[data-match="' + mid + '"]');
-      var opponent = null;
-      btns.forEach(function(b) { if(b.dataset.team !== team) opponent = b.dataset.team; });
-      if (team && opponent) { pickWinner(mid, team, opponent); return; }
-      var home = document.getElementById('m' + mid + '-home');
-      var away = document.getElementById('m' + mid + '-away');
-      if (home && away) {
-        var h = home.dataset.team, a = away.dataset.team;
-        if (h && a) pickWinner(mid, team, team === h ? a : h);
-      }
-    });
-  } catch(e) { console.warn('loadState error:', e); }
+function getPayload() {
+  return { winners: winners, scores: scores };
 }
 
-function resetAll() {
-  if (!confirm('Reset all picks and scores?')) return;
-  // Clear all winner and score state
-  Object.keys(winners).forEach(k => delete winners[k]);
-  Object.keys(scores).forEach(k => delete scores[k]);
-  // Reset all group-stage buttons
-  document.querySelectorAll('.team-btn').forEach(b => {
+function applyPayload(data) {
+  if (!data) return;
+  // Silently replay state without triggering saves
+  var w = data.winners || {};
+  var s = data.scores  || {};
+
+  // Clear current UI state
+  Object.keys(winners).forEach(function(k) { delete winners[k]; });
+  Object.keys(scores).forEach(function(k)  { delete scores[k]; });
+
+  // Reset all buttons
+  document.querySelectorAll('.team-btn').forEach(function(b) {
     b.classList.remove('winner','loser');
     if (!b.classList.contains('tbd')) b.disabled = false;
   });
-  // Remove all score rows
-  document.querySelectorAll('.score-row').forEach(r => r.remove());
-  // Reset all KO slots to defaults
-  for (let m = 73; m <= 104; m++) {
-    ['home','away'].forEach(s => clearKOSlot(m, s));
+  document.querySelectorAll('.score-inline').forEach(function(r) { r.remove(); });
+  for (var m = 73; m <= 104; m++) {
+    ['home','away'].forEach(function(sl) { clearKOSlot(m, sl); });
+  }
+  var banner = document.getElementById('champion-banner');
+  if (banner) banner.classList.remove('visible');
+  'ABCDEFGHIJKL'.split('').forEach(function(g) { groupSlots[g] = {winner:null, runnerUp:null}; });
+
+  // Pre-load scores so showScoreRow can pre-fill
+  Object.assign(scores, s);
+
+  // Replay winners in order (suppress sync saves during replay)
+  var _syncing = isSyncing;
+  isSyncing = true;
+  var order = Object.keys(w).map(Number).sort(function(a,b){return a-b;});
+  order.forEach(function(mid) {
+    var team = w[mid];
+    if (!team) return;
+    var btns = document.querySelectorAll('[data-match="' + mid + '"]');
+    var opponent = null;
+    btns.forEach(function(b) { if (b.dataset.team !== team) opponent = b.dataset.team; });
+    if (team && opponent) { pickWinner(mid, team, opponent); return; }
+    var home = document.getElementById('m' + mid + '-home');
+    var away = document.getElementById('m' + mid + '-away');
+    if (home && away) {
+      var h = home.dataset.team, a = away.dataset.team;
+      if (h && a) pickWinner(mid, team, team === h ? a : h);
+    }
+  });
+  isSyncing = _syncing;
+  renderStandings();
+}
+
+function createBin(payload) {
+  setSyncStatus('Creating shared session...', 'syncing');
+  fetch('https://api.jsonbin.io/v3/b', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'false' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data && data.metadata && data.metadata.id) {
+      BIN_ID = data.metadata.id;
+      store.set('wc2026_bin_id', BIN_ID);
+      LAST_SYNCED_VERSION = data.metadata.version || 0;
+      updateShareUrl();
+      setSyncStatus('Live \u2014 session ready', 'ok');
+      startPolling();
+    } else {
+      setSyncStatus('Sync unavailable (local only)', 'warn');
+    }
+  })
+  .catch(function() { setSyncStatus('Sync unavailable (local only)', 'warn'); });
+}
+
+function saveToBin() {
+  if (!BIN_ID || isSyncing) { pendingSave = true; return; }
+  isSyncing = true;
+  pendingSave = false;
+  setSyncStatus('Saving...', 'syncing');
+  var payload = getPayload();
+  fetch('https://api.jsonbin.io/v3/b/' + BIN_ID, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    isSyncing = false;
+    if (data && data.metadata) {
+      LAST_SYNCED_VERSION = data.metadata.version;
+      setSyncStatus('Saved \u2713', 'ok');
+    }
+    if (pendingSave) saveToBin();
+  })
+  .catch(function() {
+    isSyncing = false;
+    setSyncStatus('Save failed \u2014 retrying...', 'warn');
+    setTimeout(saveToBin, 3000);
+  });
+}
+
+function pollBin() {
+  if (!BIN_ID) return;
+  fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest')
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (!data || !data.metadata) return;
+    var v = data.metadata.version;
+    if (v !== LAST_SYNCED_VERSION) {
+      LAST_SYNCED_VERSION = v;
+      setSyncStatus('Updating...', 'syncing');
+      applyPayload(data.record);
+      setSyncStatus('Live \u2714', 'ok');
+    } else {
+      setSyncStatus('Live \u2714', 'ok');
+    }
+  })
+  .catch(function() { setSyncStatus('Polling error \u2014 retrying', 'warn'); });
+}
+
+function startPolling() {
+  if (syncPollTimer) clearInterval(syncPollTimer);
+  syncPollTimer = setInterval(pollBin, 10000);
+}
+
+function saveState() {
+  if (isSyncing) { pendingSave = true; return; }
+  if (BIN_ID) {
+    saveToBin();
+  } else {
+    // Fallback: local only
+    store.set('wc2026_winners', JSON.stringify(winners));
+    store.set('wc2026_scores',  JSON.stringify(scores));
+  }
+}
+
+function loadState() {
+  // Check for a bin ID in the URL hash first (#binid=xxx), then localStorage
+  var hashBin = null;
+  if (window.location.hash && window.location.hash.indexOf('bin=') !== -1) {
+    hashBin = window.location.hash.replace('#bin=','').trim();
+  }
+  var storedBin = store.get('wc2026_bin_id');
+  BIN_ID = hashBin || storedBin || null;
+
+  if (BIN_ID) {
+    store.set('wc2026_bin_id', BIN_ID);
+    setSyncStatus('Loading...', 'syncing');
+    // Update URL hash so this session is shareable
+    if (window.location.hash !== '#bin=' + BIN_ID) {
+      history.replaceState(null, '', '#bin=' + BIN_ID);
+    }
+    fetch('https://api.jsonbin.io/v3/b/' + BIN_ID + '/latest')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.record) {
+        LAST_SYNCED_VERSION = data.metadata ? data.metadata.version : 0;
+        applyPayload(data.record);
+        updateShareUrl();
+        setSyncStatus('Live \u2714', 'ok');
+        startPolling();
+      }
+    })
+    .catch(function() {
+      setSyncStatus('Could not load \u2014 starting fresh', 'warn');
+      createBin(getPayload());
+    });
+  } else {
+    // No bin yet — try local fallback, then create a new bin
+    try {
+      var savedScores = JSON.parse(store.get('wc2026_scores') || '{}');
+      Object.assign(scores, savedScores);
+      var saved = JSON.parse(store.get('wc2026_winners') || '{}');
+      var order = Object.keys(saved).map(Number).sort(function(a,b){return a-b;});
+      isSyncing = true;
+      order.forEach(function(mid) {
+        var team = saved[mid];
+        var btns = document.querySelectorAll('[data-match="' + mid + '"]');
+        var opponent = null;
+        btns.forEach(function(b) { if(b.dataset.team !== team) opponent = b.dataset.team; });
+        if (team && opponent) { pickWinner(mid, team, opponent); return; }
+        var home = document.getElementById('m' + mid + '-home');
+        var away = document.getElementById('m' + mid + '-away');
+        if (home && away) {
+          var h = home.dataset.team, a = away.dataset.team;
+          if (h && a) pickWinner(mid, team, team === h ? a : h);
+        }
+      });
+      isSyncing = false;
+    } catch(e) {}
+    // Now create a fresh bin with current state
+    createBin(getPayload());
+  }
+}
+
+function resetAll() {
+  if (!confirm('Reset all picks and scores for everyone?')) return;
+  Object.keys(winners).forEach(function(k) { delete winners[k]; });
+  Object.keys(scores).forEach(function(k)  { delete scores[k]; });
+  document.querySelectorAll('.team-btn').forEach(function(b) {
+    b.classList.remove('winner','loser');
+    if (!b.classList.contains('tbd')) b.disabled = false;
+  });
+  document.querySelectorAll('.score-inline').forEach(function(r) { r.remove(); });
+  for (var m = 73; m <= 104; m++) {
+    ['home','away'].forEach(function(s) { clearKOSlot(m, s); });
   }
   document.getElementById('champion-banner').classList.remove('visible');
-  'ABCDEFGHIJKL'.split('').forEach(g => groupSlots[g] = {winner:null, runnerUp:null});
-  try {
-    store.remove('wc2026_winners');
-    store.remove('wc2026_scores');
-  } catch(e) {}
+  'ABCDEFGHIJKL'.split('').forEach(function(g) { groupSlots[g] = {winner:null, runnerUp:null}; });
+  renderStandings();
+  if (BIN_ID) saveToBin();
+  else { store.remove('wc2026_winners'); store.remove('wc2026_scores'); }
 }
 
 // ─── TAB SWITCHING ────────────────────────────────────────────────────────────
@@ -1770,10 +1976,46 @@ function renderStandings() {
   wrap.innerHTML = html;
 }
 
+function updateShareUrl() {
+  var el = document.getElementById('share-url');
+  if (!el) return;
+  if (BIN_ID) {
+    var base = window.location.href.split('#')[0];
+    el.value = base + '#bin=' + BIN_ID;
+  } else {
+    el.value = 'Loading...';
+  }
+}
+
+function copyShareUrl() {
+  var el = document.getElementById('share-url');
+  if (!el) return;
+  el.select();
+  try {
+    document.execCommand('copy');
+    var btn = document.querySelector('.copy-btn');
+    if (btn) { var orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
+  } catch(e) {}
+}
+
+function newSession() {
+  if (!confirm('Start a brand new shared session? This will clear current picks for this window only and create a new link.')) return;
+  store.remove('wc2026_bin_id');
+  BIN_ID = null;
+  LAST_SYNCED_VERSION = -1;
+  if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; }
+  history.replaceState(null, '', window.location.pathname);
+  Object.keys(winners).forEach(function(k){ delete winners[k]; });
+  Object.keys(scores).forEach(function(k){ delete scores[k]; });
+  createBin(getPayload());
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 // Expose functions on window so inline onclick attributes can always resolve them
-window.switchTab   = switchTab;
-window.pickWinner  = pickWinner;
+window.switchTab    = switchTab;
+window.pickWinner   = pickWinner;
+window.copyShareUrl = copyShareUrl;
+window.newSession   = newSession;
 window.resetAll    = resetAll;
 window.saveScore   = saveScore;
 window.clampScore  = clampScore;
