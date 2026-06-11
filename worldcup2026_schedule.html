@@ -302,10 +302,9 @@
 <div class="sync-bar">
   <span class="sync-status syncing" id="sync-status">Connecting...</span>
   <div class="share-row">
-    <span class="share-label">Share:</span>
-    <input class="share-input" id="share-url" readonly value="Loading..." onclick="this.select()">
+    <span class="share-label">Share this file to sync with others</span>
     <button class="copy-btn" onclick="copyShareUrl()">Copy Link</button>
-    <button class="new-session-btn" onclick="newSession()">New Session</button>
+    <button class="new-session-btn" onclick="resetAll()">Reset All</button>
   </div>
 </div>
 
@@ -1547,30 +1546,36 @@ function recomputeGroupR32(group) {
   });
 }
 
-// ─── SHARED SYNC (GitHub Gist — no account, no API key needed) ────────────────
-// Anonymous gist creation works without auth (60 req/hr free).
-// State stored as one JSON file. All viewers poll every 10s.
-// Share URL carries the gist ID: #gist=<id>
+// ─── SHARED SYNC (Firebase Realtime Database — free, no SDK needed) ───────
+// Uses plain fetch() against Firebase REST API. No account-level auth required
+// when the DB is in Test Mode (open read/write). Share the URL hash to sync.
+//
+// SETUP: Replace FIREBASE_URL below with your Firebase Realtime Database URL.
+// e.g.  'https://YOUR-PROJECT-default-rtdb.firebaseio.com'
 
-var GIST_ID = null;
-var LAST_ETAG = null;
-var syncPollTimer = null;
-var isSyncing = false;
-var pendingSave = false;
+var FIREBASE_URL = 'https://wc-tracker-dd122-default-rtdb.firebaseio.com';
+var FB_PATH      = '/wc2026.json';
+
+var syncPollTimer    = null;
+var isSyncing        = false;
+var pendingSave      = false;
 var saveDebounceTimer = null;
-var GIST_FILENAME = 'wc2026_state.json';
-var GITHUB_API = 'https://api.github.com';
+var lastRemoteJSON   = null;
 
 const store = (function() {
   var mem = {};
-  var ls = null;
+  var ls  = null;
   try { ls = window.localStorage; ls.setItem('_t','1'); ls.removeItem('_t'); } catch(e) { ls = null; }
   return {
-    get: function(k) { try { return ls ? ls.getItem(k) : (mem[k]||null); } catch(e) { return mem[k]||null; } },
-    set: function(k,v) { try { if(ls) ls.setItem(k,v); else mem[k]=v; } catch(e) { mem[k]=v; } },
-    remove: function(k) { try { if(ls) ls.removeItem(k); else delete mem[k]; } catch(e) { delete mem[k]; } }
+    get:    function(k) { try { return ls ? ls.getItem(k)  : (mem[k]||null); } catch(e) { return mem[k]||null; } },
+    set:    function(k,v){ try { if(ls) ls.setItem(k,v);   else mem[k]=v; }  catch(e) { mem[k]=v; } },
+    remove: function(k) { try { if(ls) ls.removeItem(k);   else delete mem[k]; } catch(e) { delete mem[k]; } }
   };
 })();
+
+function isFirebaseConfigured() {
+  return FIREBASE_URL && FIREBASE_URL !== 'PASTE_YOUR_FIREBASE_URL_HERE';
+}
 
 function setSyncStatus(msg, cls) {
   var el = document.getElementById('sync-status');
@@ -1582,11 +1587,10 @@ function setSyncStatus(msg, cls) {
 function updateShareUrl() {
   var el = document.getElementById('share-url');
   if (!el) return;
-  if (GIST_ID) {
-    var base = window.location.href.split('#')[0];
-    el.value = base + '#gist=' + GIST_ID;
+  if (isFirebaseConfigured()) {
+    el.value = window.location.href.split('#')[0];
   } else {
-    el.value = 'Creating session...';
+    el.value = 'Configure Firebase URL first';
   }
 }
 
@@ -1600,8 +1604,10 @@ function applyPayload(data) {
   var s = data.scores  || {};
   var wasSyncing = isSyncing;
   isSyncing = true;
+
   Object.keys(winners).forEach(function(k) { delete winners[k]; });
   Object.keys(scores).forEach(function(k)  { delete scores[k]; });
+
   document.querySelectorAll('.team-btn').forEach(function(b) {
     b.classList.remove('winner','loser');
     if (!b.classList.contains('tbd')) b.disabled = false;
@@ -1613,7 +1619,9 @@ function applyPayload(data) {
   var banner = document.getElementById('champion-banner');
   if (banner) banner.classList.remove('visible');
   'ABCDEFGHIJKL'.split('').forEach(function(g) { groupSlots[g] = {winner:null, runnerUp:null}; });
+
   Object.assign(scores, s);
+
   var order = Object.keys(w).map(Number).sort(function(a,b){return a-b;});
   order.forEach(function(mid) {
     var team = w[mid];
@@ -1629,136 +1637,117 @@ function applyPayload(data) {
       if (h && a) pickWinner(mid, team, team === h ? a : h);
     }
   });
+
   isSyncing = wasSyncing;
   renderStandings();
 }
 
-function createGist(payload) {
-  setSyncStatus('Creating session...', 'syncing');
-  var body = { description: 'WC2026 Tracker', public: false, files: {} };
-  body.files[GIST_FILENAME] = { content: JSON.stringify(payload) };
-  fetch(GITHUB_API + '/gists', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-    body: JSON.stringify(body)
-  })
-  .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(function(data) {
-    GIST_ID = data.id;
-    store.set('wc2026_gist_id', GIST_ID);
-    updateShareUrl();
-    setSyncStatus('Live \u2714', 'ok');
-    startPolling();
-  })
-  .catch(function(e) {
-    setSyncStatus('Sync unavailable \u2014 local only', 'warn');
-    console.warn('createGist failed:', e);
-  });
-}
-
-function saveToGist() {
-  if (!GIST_ID || isSyncing) { pendingSave = true; return; }
+function saveToFirebase() {
+  if (!isFirebaseConfigured()) return;
+  if (isSyncing) { pendingSave = true; return; }
   isSyncing = true;
   pendingSave = false;
   setSyncStatus('Saving...', 'syncing');
-  var body = { files: {} };
-  body.files[GIST_FILENAME] = { content: JSON.stringify(getPayload()) };
-  fetch(GITHUB_API + '/gists/' + GIST_ID, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' },
-    body: JSON.stringify(body)
+  var payload = getPayload();
+  lastRemoteJSON = JSON.stringify(payload);
+  fetch(FIREBASE_URL + FB_PATH, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: lastRemoteJSON
   })
   .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-  .then(function(data) {
+  .then(function() {
     isSyncing = false;
-    LAST_ETAG = data.updated_at || null;
     setSyncStatus('Saved \u2713', 'ok');
-    setTimeout(function(){ setSyncStatus('Live \u2714','ok'); }, 1500);
-    if (pendingSave) saveToGist();
+    setTimeout(function(){ setSyncStatus('Live \u2714', 'ok'); }, 1200);
+    if (pendingSave) saveToFirebase();
   })
   .catch(function(e) {
     isSyncing = false;
     setSyncStatus('Save failed \u2014 retrying...', 'warn');
-    setTimeout(saveToGist, 4000);
-    console.warn('saveToGist failed:', e);
+    setTimeout(saveToFirebase, 4000);
+    console.warn('saveToFirebase:', e);
   });
 }
 
-function pollGist() {
-  if (!GIST_ID || isSyncing) return;
-  var headers = { 'Accept': 'application/vnd.github.v3+json' };
-  if (LAST_ETAG) headers['If-None-Match'] = LAST_ETAG;
-  fetch(GITHUB_API + '/gists/' + GIST_ID, { headers: headers })
-  .then(function(r) {
-    if (r.status === 304) return null;
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    LAST_ETAG = r.headers.get('ETag') || null;
-    return r.json();
-  })
+function pollFirebase() {
+  if (!isFirebaseConfigured() || isSyncing) return;
+  fetch(FIREBASE_URL + FB_PATH)
+  .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
   .then(function(data) {
     if (!data) return;
-    var file = data.files && data.files[GIST_FILENAME];
-    if (!file) return;
-    var remote = JSON.parse(file.content);
+    var remoteStr = JSON.stringify({ winners: data.winners || {}, scores: data.scores || {} });
     var localStr  = JSON.stringify(getPayload());
-    var remoteStr = JSON.stringify({ winners: remote.winners || {}, scores: remote.scores || {} });
-    if (localStr !== remoteStr) {
+    if (remoteStr !== lastRemoteJSON && remoteStr !== localStr) {
+      lastRemoteJSON = remoteStr;
       setSyncStatus('Updating...', 'syncing');
-      applyPayload(remote);
+      applyPayload(data);
       setSyncStatus('Live \u2714', 'ok');
     }
   })
   .catch(function(e) {
     setSyncStatus('Poll error \u2014 retrying', 'warn');
-    console.warn('pollGist failed:', e);
+    console.warn('pollFirebase:', e);
   });
 }
 
 function startPolling() {
   if (syncPollTimer) clearInterval(syncPollTimer);
-  syncPollTimer = setInterval(pollGist, 10000);
+  syncPollTimer = setInterval(pollFirebase, 8000);
 }
 
 function saveState() {
   if (isSyncing) { pendingSave = true; return; }
   if (saveDebounceTimer) clearTimeout(saveDebounceTimer);
   saveDebounceTimer = setTimeout(function() {
-    if (GIST_ID) saveToGist();
-    else { store.set('wc2026_winners', JSON.stringify(winners)); store.set('wc2026_scores', JSON.stringify(scores)); }
-  }, 800);
+    if (isFirebaseConfigured()) saveToFirebase();
+    else {
+      store.set('wc2026_winners', JSON.stringify(winners));
+      store.set('wc2026_scores',  JSON.stringify(scores));
+    }
+  }, 600);
 }
 
 function loadState() {
-  var hashGist = null;
-  if (window.location.hash && window.location.hash.indexOf('gist=') !== -1) {
-    hashGist = window.location.hash.replace('#gist=','').trim();
+  updateShareUrl();
+  if (!isFirebaseConfigured()) {
+    setSyncStatus('No Firebase URL \u2014 local only', 'warn');
+    // Fall back to localStorage
+    try {
+      var sc = JSON.parse(store.get('wc2026_scores') || '{}');
+      Object.assign(scores, sc);
+      var saved = JSON.parse(store.get('wc2026_winners') || '{}');
+      isSyncing = true;
+      Object.keys(saved).map(Number).sort(function(a,b){return a-b;}).forEach(function(mid) {
+        var team = saved[mid];
+        var btns = document.querySelectorAll('[data-match="' + mid + '"]');
+        var opponent = null;
+        btns.forEach(function(b){ if(b.dataset.team !== team) opponent = b.dataset.team; });
+        if (team && opponent) { pickWinner(mid, team, opponent); return; }
+        var h2 = document.getElementById('m'+mid+'-home');
+        var a2 = document.getElementById('m'+mid+'-away');
+        if (h2 && a2 && h2.dataset.team && a2.dataset.team)
+          pickWinner(mid, team, team === h2.dataset.team ? a2.dataset.team : h2.dataset.team);
+      });
+      isSyncing = false;
+    } catch(ignore) {}
+    return;
   }
-  var storedGist = store.get('wc2026_gist_id');
-  GIST_ID = hashGist || storedGist || null;
-  if (GIST_ID) {
-    store.set('wc2026_gist_id', GIST_ID);
-    if (window.location.hash !== '#gist=' + GIST_ID) {
-      history.replaceState(null, '', '#gist=' + GIST_ID);
+  setSyncStatus('Loading...', 'syncing');
+  fetch(FIREBASE_URL + FB_PATH)
+  .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+  .then(function(data) {
+    if (data) {
+      lastRemoteJSON = JSON.stringify({ winners: data.winners || {}, scores: data.scores || {} });
+      applyPayload(data);
     }
-    updateShareUrl();
-    setSyncStatus('Loading...', 'syncing');
-    fetch(GITHUB_API + '/gists/' + GIST_ID, { headers: { 'Accept': 'application/vnd.github.v3+json' } })
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); LAST_ETAG = r.headers.get('ETag') || null; return r.json(); })
-    .then(function(data) {
-      var file = data.files && data.files[GIST_FILENAME];
-      if (file) applyPayload(JSON.parse(file.content));
-      setSyncStatus('Live \u2714', 'ok');
-      startPolling();
-    })
-    .catch(function(e) {
-      setSyncStatus('Load failed \u2014 starting fresh', 'warn');
-      GIST_ID = null; store.remove('wc2026_gist_id');
-      history.replaceState(null, '', window.location.pathname);
-      createGist(getPayload());
-    });
-  } else {
-    createGist(getPayload());
-  }
+    setSyncStatus('Live \u2714', 'ok');
+    startPolling();
+  })
+  .catch(function(e) {
+    setSyncStatus('Load failed \u2014 check Firebase URL', 'warn');
+    console.warn('loadState:', e);
+  });
 }
 
 function resetAll() {
@@ -1776,7 +1765,7 @@ function resetAll() {
   document.getElementById('champion-banner').classList.remove('visible');
   'ABCDEFGHIJKL'.split('').forEach(function(g) { groupSlots[g] = {winner:null, runnerUp:null}; });
   renderStandings();
-  if (GIST_ID) saveToGist();
+  if (isFirebaseConfigured()) saveToFirebase();
   else { store.remove('wc2026_winners'); store.remove('wc2026_scores'); }
 }
 
@@ -1976,26 +1965,23 @@ function updateShareUrl() {
 }
 
 function copyShareUrl() {
-  var el = document.getElementById('share-url');
-  if (!el) return;
-  el.select();
-  try {
-    document.execCommand('copy');
+  var url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      var btn = document.querySelector('.copy-btn');
+      if (btn) { var o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = o; }, 1500); }
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = url; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
     var btn = document.querySelector('.copy-btn');
-    if (btn) { var orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
-  } catch(e) {}
+    if (btn) { var o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = o; }, 1500); }
+  }
 }
 
 function newSession() {
-  if (!confirm('Start a brand new shared session? This will create a new link.')) return;
-  store.remove('wc2026_gist_id');
-  GIST_ID = null;
-  LAST_ETAG = null;
-  if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; }
-  history.replaceState(null, '', window.location.pathname);
-  Object.keys(winners).forEach(function(k){ delete winners[k]; });
-  Object.keys(scores).forEach(function(k){ delete scores[k]; });
-  createGist(getPayload());
+  alert('With Firebase, everyone who has this HTML file shares the same database automatically. Just send them the file or host it somewhere and share the link.');
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
