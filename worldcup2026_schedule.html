@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIFA World Cup 2026 — Full Schedule</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+  :root {
+    --pitch: #0a4f2e; --pitch-mid: #0d6638;
+    --gold: #c9a227; --gold-light: #e8c55a;
+    --white: #f5f5f0; --off-white: #e8e6df;
+    --ink: #1a1a18; --ink-soft: #3d3d38;
+    --muted: #7a7a72; --card-bg: #111110;
+    --border: rgba(201,162,39,0.2);
+    --win-bg: rgba(13,102,56,0.25);
+    --win-border: #0d6638;
+    --lose-bg: rgba(80,20,20,0.3);
+    --lose-color: #6a4040;
+    --ga:#1a3f6e;--gb:#4a1a6e;--gc:#6e1a1a;--gd:#1a6e4a;
+    --ge:#6e4a1a;--gf:#1a5a6e;--gg:#5a6e1a;--gh:#6e1a5a;
+    --gi:#1a6e6e;--gj:#3d1a6e;--gk:#6e3d1a;--gl:#1a6e3d;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--ink);color:var(--white);font-family:'Inter',system-ui,sans-serif;font-size:14px;line-height:1.6;overflow-x:hidden}
+
+  /* HEADER */
+  header{background:linear-gradient(160deg,#0d1f12 0%,#081a0e 50%,#050f08 100%);border-bottom:1px solid var(--border);padding:48px 24px 36px;text-align:center;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 60px,rgba(201,162,39,.03) 60px,rgba(201,162,39,.03) 61px),repeating-linear-gradient(0deg,transparent 0,transparent 60px,rgba(201,162,39,.03) 60px,rgba(201,162,39,.03) 61px);pointer-events:none}
+  .trophy-icon{font-size:48px;display:block;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(201,162,39,.4))}
+  header h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,8vw,72px);letter-spacing:4px;color:var(--white);line-height:1;text-shadow:0 0 40px rgba(201,162,39,.3)}
+  header h1 span{color:var(--gold)}
+  .header-sub{font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-top:12px;opacity:.85}
+  .header-meta{display:flex;justify-content:center;gap:16px;margin-top:28px;flex-wrap:wrap}
+  .meta-pill{background:rgba(201,162,39,.1);border:1px solid var(--border);border-radius:4px;padding:6px 16px;font-size:12px;font-weight:500;color:var(--gold-light);font-family:'Roboto Mono',monospace;letter-spacing:1px}
+
+  /* NAV */
+  nav{background:#0d0d0b;border-bottom:1px solid rgba(255,255,255,.08);display:flex;overflow-x:auto;scrollbar-width:none;position:sticky;top:0;z-index:100;justify-content:space-between;align-items:center;padding-right:12px}
+  nav::-webkit-scrollbar{display:none}
+  .nav-links{display:flex}
+  nav a{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:14px 16px;white-space:nowrap;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;flex-shrink:0}
+  nav a:hover{color:var(--gold);border-bottom-color:var(--gold)}
+  .reset-btn{font-family:'Roboto Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;background:rgba(180,40,40,.15);border:1px solid rgba(180,40,40,.35);color:#c07070;padding:5px 12px;border-radius:3px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .2s,color .2s}
+  .reset-btn:hover{background:rgba(180,40,40,.3);color:#e08080}
+
+  /* MAIN */
+  main{max-width:1100px;margin:0 auto;padding:0 16px 64px}
+
+  /* STAGE HEADERS */
+  .stage-header{display:flex;align-items:center;gap:16px;margin:48px 0 24px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+  .stage-badge{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:3px;background:var(--gold);color:var(--ink);padding:4px 10px;border-radius:2px;white-space:nowrap;flex-shrink:0}
+  .stage-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,4vw,32px);letter-spacing:2px;color:var(--white)}
+  .stage-dates{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+
+  /* DAY LABELS */
+  .day-block{margin-bottom:8px}
+  .day-label{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 0 6px;border-top:1px solid rgba(255,255,255,.06);margin-top:16px}
+
+  /* MATCH ROWS */
+  .matches{display:flex;flex-direction:column;gap:4px}
+  .match{display:grid;grid-template-columns:40px 80px 1fr auto;align-items:center;gap:10px;background:var(--card-bg);border:1px solid rgba(255,255,255,.05);border-left:3px solid var(--group-color,var(--pitch-mid));border-radius:4px;padding:6px 14px 6px 10px;transition:background .15s}
+  .match:hover{background:rgba(255,255,255,.03)}
+  .match-num{font-family:'Roboto Mono',monospace;font-size:10px;color:var(--muted);text-align:center;flex-shrink:0}
+  .group-tag{font-family:'Roboto Mono',monospace;font-size:10px;font-weight:500;background:var(--group-color,var(--pitch));color:rgba(255,255,255,.85);padding:2px 7px;border-radius:2px;text-align:center;letter-spacing:1px;flex-shrink:0}
+  .match-teams{display:flex;align-items:center;gap:0;flex-wrap:nowrap;min-width:0}
+  .vs-sep{font-weight:300;color:var(--muted);margin:0 8px;font-size:12px;flex-shrink:0}
+  .match-info{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0}
+  .match-time{font-family:'Roboto Mono',monospace;font-size:11px;font-weight:500;color:var(--gold-light);white-space:nowrap}
+  .match-venue{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+
+  /* TEAM BUTTONS */
+  .team-btn{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;background:none;border:none;color:var(--white);cursor:pointer;padding:5px 10px;border-radius:3px;transition:background .15s,color .15s,opacity .15s;text-align:left;white-space:nowrap;position:relative;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+  .team-btn:hover:not(:disabled){background:rgba(201,162,39,.15);color:var(--gold-light)}
+  .team-btn.winner{background:var(--win-bg);color:#6ddc9e;border:1px solid var(--win-border)}
+  .team-btn.winner::after{content:'✓';margin-left:6px;font-size:10px;opacity:.7}
+  .team-btn.loser{color:var(--lose-color);background:none;border:none;text-decoration:line-through;opacity:.5;cursor:default}
+  .team-btn.tbd{color:var(--muted);font-style:italic;font-weight:400;cursor:default;font-size:12px}
+  .team-btn:disabled{cursor:default}
+
+  /* GROUP COLORS */
+  .g-A{--group-color:var(--ga)}.g-B{--group-color:var(--gb)}.g-C{--group-color:var(--gc)}
+  .g-D{--group-color:var(--gd)}.g-E{--group-color:var(--ge)}.g-F{--group-color:var(--gf)}
+  .g-G{--group-color:var(--gg)}.g-H{--group-color:var(--gh)}.g-I{--group-color:var(--gi)}
+  .g-J{--group-color:var(--gj)}.g-K{--group-color:var(--gk)}.g-L{--group-color:var(--gl)}
+  .g-R32{--group-color:#3a3a32}.g-R16{--group-color:#1a3a5e}
+  .g-QF{--group-color:#5e3a1a}.g-SF{--group-color:#1a5e3a}
+  .g-3PL{--group-color:#5e1a3a}.g-FIN{--group-color:#8b6914}
+
+  /* KO NOTE */
+  .ko-note{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:4px;border-left:2px solid var(--gold)}
+
+  /* FINAL CARD */
+  .final-card{margin:32px 0;background:linear-gradient(135deg,#1a0f00 0%,#0d0800 100%);border:1px solid var(--gold);border-radius:8px;padding:32px 24px;text-align:center;position:relative;overflow:hidden}
+  .final-card::before{content:'★ FINAL ★';position:absolute;top:-1px;left:50%;transform:translateX(-50%);font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:4px;background:var(--gold);color:var(--ink);padding:3px 16px;border-radius:0 0 4px 4px;font-weight:600}
+  .final-date{font-family:'Roboto Mono',monospace;font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:12px;margin-top:8px}
+  .final-teams{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .final-team-btn{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;background:none;border:1px solid rgba(201,162,39,.3);color:var(--white);cursor:pointer;padding:8px 20px;border-radius:4px;transition:background .2s,color .2s}
+  .final-team-btn:hover:not(:disabled){background:rgba(201,162,39,.15);color:var(--gold-light)}
+  .final-team-btn.winner{background:rgba(201,162,39,.25);color:var(--gold-light);border-color:var(--gold)}
+  .final-team-btn.loser{color:#6a5a30;border-color:rgba(201,162,39,.1);text-decoration:line-through;opacity:.4;cursor:default}
+  .final-team-btn.tbd{color:var(--muted);font-style:italic;font-size:18px;cursor:default}
+  .final-vs{font-family:'Roboto Mono',monospace;font-size:14px;color:var(--muted)}
+  .final-venue{font-size:13px;color:var(--muted)}
+  .final-time{font-family:'Roboto Mono',monospace;font-size:16px;color:var(--gold-light);font-weight:500;margin-top:8px}
+  .champion-banner{margin-top:16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:4px;color:var(--gold);display:none}
+  .champion-banner.visible{display:block}
+
+  /* LEGEND */
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0;padding:16px;background:var(--card-bg);border-radius:6px;border:1px solid rgba(255,255,255,.06)}
+  .legend-title{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);width:100%;margin-bottom:4px}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--off-white)}
+  .legend-swatch{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+
+  /* INSTRUCTION HINT */
+  .hint{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);padding:8px 14px;background:rgba(201,162,39,.05);border:1px solid rgba(201,162,39,.12);border-radius:4px;margin-bottom:20px}
+
+  /* RESPONSIVE */
+  @media(max-width:700px){
+    .match{grid-template-columns:32px 52px 1fr}
+    .match-info{display:none}
+    .team-btn{font-size:12px;max-width:140px}
+  }
+  @media(max-width:480px){
+    .match{grid-template-columns:1fr}
+    .match-num{display:none}
+  }
+
+  footer{text-align:center;padding:32px 16px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:var(--muted);font-family:'Roboto Mono',monospace;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="trophy-icon">🏆</span>
+  <h1>FIFA World Cup <span>2026</span></h1>
+  <p class="header-sub">Full Interactive Schedule · All Times Eastern (ET)</p>
+  <div class="header-meta">
+    <span class="meta-pill">📅 Jun 11 – Jul 19, 2026</span>
+    <span class="meta-pill">🌍 USA · Canada · Mexico</span>
+    <span class="meta-pill">⚽ 104 Matches</span>
+    <span class="meta-pill">🏟 16 Stadiums</span>
+    <span class="meta-pill">🚩 48 Teams</span>
+  </div>
+</header>
+
+<nav>
+  <div class="nav-links">
+    <a href="#group-stage">Group Stage</a>
+    <a href="#round32">Round of 32</a>
+    <a href="#round16">Round of 16</a>
+    <a href="#quarters">Quarters</a>
+    <a href="#semis">Semis</a>
+    <a href="#third">3rd Place</a>
+    <a href="#final">Final</a>
+  </div>
+  <button class="reset-btn" onclick="resetAll()">↺ Reset All</button>
+</nav>
+
+<main>
+
+<div class="hint">👆 Click a team name to mark them as the winner — they'll advance to the next round automatically. Click again to undo.</div>
+
+<!-- ═══ GROUP STAGE ═══ -->
+<section id="group-stage">
+  <div class="stage-header">
+    <span class="stage-badge">Phase 1</span>
+    <h2 class="stage-title">Group Stage</h2>
+    <span class="stage-dates">Jun 11 – Jun 27</span>
+  </div>
+
+  <div class="legend">
+    <div class="legend-title">Group Color Key</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--ga)"></div>Group A</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gb)"></div>Group B</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gc)"></div>Group C</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gd)"></div>Group D</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--ge)"></div>Group E</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gf)"></div>Group F</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gg)"></div>Group G</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gh)"></div>Group H</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gi)"></div>Group I</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gj)"></div>Group J</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gk)"></div>Group K</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--gl)"></div>Group L</div>
+  </div>
+
+  <div class="day-label">Thursday · June 11 · 🇲🇽 Opening Day</div>
+  <div class="matches">
+    <!-- Match 1: Mexico vs South Africa -->
+    <div class="match g-A" id="match-1">
+      <span class="match-num">1</span>
+      <span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="1" data-side="home" data-team="Mexico" onclick="pickWinner(1,'Mexico','South Africa')">Mexico</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="1" data-side="away" data-team="South Africa" onclick="pickWinner(1,'South Africa','Mexico')">South Africa</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Estadio Azteca, Mexico City</span></div>
+    </div>
+    <div class="match g-A" id="match-2">
+      <span class="match-num">2</span>
+      <span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="2" data-team="South Korea" onclick="pickWinner(2,'South Korea','Czechia')">South Korea</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="2" data-team="Czechia" onclick="pickWinner(2,'Czechia','South Korea')">Czechia</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Estadio Akron, Zapopan</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Friday · June 12 · 🇨🇦🇺🇸 Host Nations Open</div>
+  <div class="matches">
+    <div class="match g-B" id="match-3">
+      <span class="match-num">3</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="3" data-team="Canada" onclick="pickWinner(3,'Canada','Bosnia &amp; Herzegovina')">Canada</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="3" data-team="Bosnia &amp; Herzegovina" onclick="pickWinner(3,'Bosnia &amp; Herzegovina','Canada')">Bosnia &amp; Herzegovina</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">BMO Field, Toronto</span></div>
+    </div>
+    <div class="match g-D" id="match-4">
+      <span class="match-num">4</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="4" data-team="USA" onclick="pickWinner(4,'USA','Paraguay')">USA</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="4" data-team="Paraguay" onclick="pickWinner(4,'Paraguay','USA')">Paraguay</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">SoFi Stadium, Inglewood</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Saturday · June 13</div>
+  <div class="matches">
+    <div class="match g-B" id="match-5">
+      <span class="match-num">5</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="5" data-team="Qatar" onclick="pickWinner(5,'Qatar','Switzerland')">Qatar</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="5" data-team="Switzerland" onclick="pickWinner(5,'Switzerland','Qatar')">Switzerland</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div>
+    </div>
+    <div class="match g-C" id="match-6">
+      <span class="match-num">6</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="6" data-team="Brazil" onclick="pickWinner(6,'Brazil','Morocco')">Brazil</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="6" data-team="Morocco" onclick="pickWinner(6,'Morocco','Brazil')">Morocco</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div>
+    </div>
+    <div class="match g-C" id="match-7">
+      <span class="match-num">7</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="7" data-team="Haiti" onclick="pickWinner(7,'Haiti','Scotland')">Haiti</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="7" data-team="Scotland" onclick="pickWinner(7,'Scotland','Haiti')">Scotland</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">Gillette Stadium, Foxborough</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Sunday · June 14</div>
+  <div class="matches">
+    <div class="match g-D" id="match-8">
+      <span class="match-num">8</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="8" data-team="Australia" onclick="pickWinner(8,'Australia','Türkiye')">Australia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="8" data-team="Türkiye" onclick="pickWinner(8,'Türkiye','Australia')">Türkiye</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 AM</span><span class="match-venue">BC Place, Vancouver</span></div>
+    </div>
+    <div class="match g-E" id="match-9">
+      <span class="match-num">9</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="9" data-team="Germany" onclick="pickWinner(9,'Germany','Curaçao')">Germany</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="9" data-team="Curaçao" onclick="pickWinner(9,'Curaçao','Germany')">Curaçao</button>
+      </div>
+      <div class="match-info"><span class="match-time">1:00 PM</span><span class="match-venue">NRG Stadium, Houston</span></div>
+    </div>
+    <div class="match g-F" id="match-10">
+      <span class="match-num">10</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="10" data-team="Netherlands" onclick="pickWinner(10,'Netherlands','Japan')">Netherlands</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="10" data-team="Japan" onclick="pickWinner(10,'Japan','Netherlands')">Japan</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div>
+    </div>
+    <div class="match g-E" id="match-11">
+      <span class="match-num">11</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="11" data-team="Ivory Coast" onclick="pickWinner(11,'Ivory Coast','Ecuador')">Ivory Coast</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="11" data-team="Ecuador" onclick="pickWinner(11,'Ecuador','Ivory Coast')">Ecuador</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:00 PM</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div>
+    </div>
+    <div class="match g-F" id="match-12">
+      <span class="match-num">12</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="12" data-team="Sweden" onclick="pickWinner(12,'Sweden','Tunisia')">Sweden</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="12" data-team="Tunisia" onclick="pickWinner(12,'Tunisia','Sweden')">Tunisia</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Estadio BBVA, Monterrey</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Monday · June 15</div>
+  <div class="matches">
+    <div class="match g-H" id="match-13">
+      <span class="match-num">13</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="13" data-team="Spain" onclick="pickWinner(13,'Spain','Cape Verde')">Spain</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="13" data-team="Cape Verde" onclick="pickWinner(13,'Cape Verde','Spain')">Cape Verde</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 PM</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div>
+    </div>
+    <div class="match g-G" id="match-14">
+      <span class="match-num">14</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="14" data-team="Belgium" onclick="pickWinner(14,'Belgium','Egypt')">Belgium</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="14" data-team="Egypt" onclick="pickWinner(14,'Egypt','Belgium')">Egypt</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Lumen Field, Seattle</span></div>
+    </div>
+    <div class="match g-H" id="match-15">
+      <span class="match-num">15</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="15" data-team="Saudi Arabia" onclick="pickWinner(15,'Saudi Arabia','Uruguay')">Saudi Arabia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="15" data-team="Uruguay" onclick="pickWinner(15,'Uruguay','Saudi Arabia')">Uruguay</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div>
+    </div>
+    <div class="match g-G" id="match-16">
+      <span class="match-num">16</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="16" data-team="Iran" onclick="pickWinner(16,'Iran','New Zealand')">Iran</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="16" data-team="New Zealand" onclick="pickWinner(16,'New Zealand','Iran')">New Zealand</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">SoFi Stadium, Inglewood</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Tuesday · June 16</div>
+  <div class="matches">
+    <div class="match g-I" id="match-17">
+      <span class="match-num">17</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="17" data-team="France" onclick="pickWinner(17,'France','Senegal')">France</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="17" data-team="Senegal" onclick="pickWinner(17,'Senegal','France')">Senegal</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div>
+    </div>
+    <div class="match g-I" id="match-18">
+      <span class="match-num">18</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="18" data-team="Iraq" onclick="pickWinner(18,'Iraq','Norway')">Iraq</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="18" data-team="Norway" onclick="pickWinner(18,'Norway','Iraq')">Norway</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Gillette Stadium, Foxborough</span></div>
+    </div>
+    <div class="match g-J" id="match-19">
+      <span class="match-num">19</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="19" data-team="Argentina" onclick="pickWinner(19,'Argentina','Algeria')">Argentina</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="19" data-team="Algeria" onclick="pickWinner(19,'Algeria','Argentina')">Algeria</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Wednesday · June 17</div>
+  <div class="matches">
+    <div class="match g-J" id="match-20">
+      <span class="match-num">20</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="20" data-team="Austria" onclick="pickWinner(20,'Austria','Jordan')">Austria</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="20" data-team="Jordan" onclick="pickWinner(20,'Jordan','Austria')">Jordan</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 AM</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div>
+    </div>
+    <div class="match g-K" id="match-21">
+      <span class="match-num">21</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="21" data-team="Portugal" onclick="pickWinner(21,'Portugal','DR Congo')">Portugal</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="21" data-team="DR Congo" onclick="pickWinner(21,'DR Congo','Portugal')">DR Congo</button>
+      </div>
+      <div class="match-info"><span class="match-time">1:00 PM</span><span class="match-venue">NRG Stadium, Houston</span></div>
+    </div>
+    <div class="match g-L" id="match-22">
+      <span class="match-num">22</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="22" data-team="England" onclick="pickWinner(22,'England','Croatia')">England</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="22" data-team="Croatia" onclick="pickWinner(22,'Croatia','England')">Croatia</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div>
+    </div>
+    <div class="match g-L" id="match-23">
+      <span class="match-num">23</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="23" data-team="Ghana" onclick="pickWinner(23,'Ghana','Panama')">Ghana</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="23" data-team="Panama" onclick="pickWinner(23,'Panama','Ghana')">Panama</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:00 PM</span><span class="match-venue">BMO Field, Toronto</span></div>
+    </div>
+    <div class="match g-K" id="match-24">
+      <span class="match-num">24</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="24" data-team="Uzbekistan" onclick="pickWinner(24,'Uzbekistan','Colombia')">Uzbekistan</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="24" data-team="Colombia" onclick="pickWinner(24,'Colombia','Uzbekistan')">Colombia</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Estadio Azteca, Mexico City</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Thursday · June 18</div>
+  <div class="matches">
+    <div class="match g-A" id="match-25">
+      <span class="match-num">25</span><span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="25" data-team="Czechia" onclick="pickWinner(25,'Czechia','South Africa')">Czechia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="25" data-team="South Africa" onclick="pickWinner(25,'South Africa','Czechia')">South Africa</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 PM</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div>
+    </div>
+    <div class="match g-B" id="match-26">
+      <span class="match-num">26</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="26" data-team="Switzerland" onclick="pickWinner(26,'Switzerland','Bosnia &amp; Herzegovina')">Switzerland</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="26" data-team="Bosnia &amp; Herzegovina" onclick="pickWinner(26,'Bosnia &amp; Herzegovina','Switzerland')">Bosnia &amp; Herzegovina</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">SoFi Stadium, Inglewood</span></div>
+    </div>
+    <div class="match g-B" id="match-27">
+      <span class="match-num">27</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="27" data-team="Canada" onclick="pickWinner(27,'Canada','Qatar')">Canada</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="27" data-team="Qatar" onclick="pickWinner(27,'Qatar','Canada')">Qatar</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">BC Place, Vancouver</span></div>
+    </div>
+    <div class="match g-A" id="match-28">
+      <span class="match-num">28</span><span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="28" data-team="Mexico" onclick="pickWinner(28,'Mexico','South Korea')">Mexico</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="28" data-team="South Korea" onclick="pickWinner(28,'South Korea','Mexico')">South Korea</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">Estadio Akron, Zapopan</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Friday · June 19</div>
+  <div class="matches">
+    <div class="match g-D" id="match-29">
+      <span class="match-num">29</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="29" data-team="USA" onclick="pickWinner(29,'USA','Australia')">USA</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="29" data-team="Australia" onclick="pickWinner(29,'Australia','USA')">Australia</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Lumen Field, Seattle</span></div>
+    </div>
+    <div class="match g-C" id="match-30">
+      <span class="match-num">30</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="30" data-team="Scotland" onclick="pickWinner(30,'Scotland','Morocco')">Scotland</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="30" data-team="Morocco" onclick="pickWinner(30,'Morocco','Scotland')">Morocco</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Gillette Stadium, Foxborough</span></div>
+    </div>
+    <div class="match g-C" id="match-31">
+      <span class="match-num">31</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="31" data-team="Brazil" onclick="pickWinner(31,'Brazil','Haiti')">Brazil</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="31" data-team="Haiti" onclick="pickWinner(31,'Haiti','Brazil')">Haiti</button>
+      </div>
+      <div class="match-info"><span class="match-time">8:30 PM</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div>
+    </div>
+    <div class="match g-D" id="match-32">
+      <span class="match-num">32</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="32" data-team="Türkiye" onclick="pickWinner(32,'Türkiye','Paraguay')">Türkiye</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="32" data-team="Paraguay" onclick="pickWinner(32,'Paraguay','Türkiye')">Paraguay</button>
+      </div>
+      <div class="match-info"><span class="match-time">11:00 PM</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Saturday · June 20</div>
+  <div class="matches">
+    <div class="match g-F" id="match-33">
+      <span class="match-num">33</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="33" data-team="Netherlands" onclick="pickWinner(33,'Netherlands','Sweden')">Netherlands</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="33" data-team="Sweden" onclick="pickWinner(33,'Sweden','Netherlands')">Sweden</button>
+      </div>
+      <div class="match-info"><span class="match-time">1:00 PM</span><span class="match-venue">NRG Stadium, Houston</span></div>
+    </div>
+    <div class="match g-E" id="match-34">
+      <span class="match-num">34</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="34" data-team="Germany" onclick="pickWinner(34,'Germany','Ivory Coast')">Germany</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="34" data-team="Ivory Coast" onclick="pickWinner(34,'Ivory Coast','Germany')">Ivory Coast</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">BMO Field, Toronto</span></div>
+    </div>
+    <div class="match g-E" id="match-35">
+      <span class="match-num">35</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="35" data-team="Ecuador" onclick="pickWinner(35,'Ecuador','Curaçao')">Ecuador</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="35" data-team="Curaçao" onclick="pickWinner(35,'Curaçao','Ecuador')">Curaçao</button>
+      </div>
+      <div class="match-info"><span class="match-time">8:00 PM</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Sunday · June 21</div>
+  <div class="matches">
+    <div class="match g-F" id="match-36">
+      <span class="match-num">36</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="36" data-team="Tunisia" onclick="pickWinner(36,'Tunisia','Japan')">Tunisia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="36" data-team="Japan" onclick="pickWinner(36,'Japan','Tunisia')">Japan</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 AM</span><span class="match-venue">Estadio BBVA, Monterrey</span></div>
+    </div>
+    <div class="match g-H" id="match-37">
+      <span class="match-num">37</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="37" data-team="Spain" onclick="pickWinner(37,'Spain','Saudi Arabia')">Spain</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="37" data-team="Saudi Arabia" onclick="pickWinner(37,'Saudi Arabia','Spain')">Saudi Arabia</button>
+      </div>
+      <div class="match-info"><span class="match-time">12:00 PM</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div>
+    </div>
+    <div class="match g-G" id="match-38">
+      <span class="match-num">38</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="38" data-team="Belgium" onclick="pickWinner(38,'Belgium','Iran')">Belgium</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="38" data-team="Iran" onclick="pickWinner(38,'Iran','Belgium')">Iran</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">SoFi Stadium, Inglewood</span></div>
+    </div>
+    <div class="match g-H" id="match-39">
+      <span class="match-num">39</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="39" data-team="Uruguay" onclick="pickWinner(39,'Uruguay','Cape Verde')">Uruguay</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="39" data-team="Cape Verde" onclick="pickWinner(39,'Cape Verde','Uruguay')">Cape Verde</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div>
+    </div>
+    <div class="match g-G" id="match-40">
+      <span class="match-num">40</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="40" data-team="New Zealand" onclick="pickWinner(40,'New Zealand','Egypt')">New Zealand</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="40" data-team="Egypt" onclick="pickWinner(40,'Egypt','New Zealand')">Egypt</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">BC Place, Vancouver</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Monday · June 22</div>
+  <div class="matches">
+    <div class="match g-J" id="match-41">
+      <span class="match-num">41</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="41" data-team="Argentina" onclick="pickWinner(41,'Argentina','Austria')">Argentina</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="41" data-team="Austria" onclick="pickWinner(41,'Austria','Argentina')">Austria</button>
+      </div>
+      <div class="match-info"><span class="match-time">1:00 PM</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div>
+    </div>
+    <div class="match g-I" id="match-42">
+      <span class="match-num">42</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="42" data-team="France" onclick="pickWinner(42,'France','Iraq')">France</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="42" data-team="Iraq" onclick="pickWinner(42,'Iraq','France')">Iraq</button>
+      </div>
+      <div class="match-info"><span class="match-time">5:00 PM</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div>
+    </div>
+    <div class="match g-I" id="match-43">
+      <span class="match-num">43</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="43" data-team="Norway" onclick="pickWinner(43,'Norway','Senegal')">Norway</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="43" data-team="Senegal" onclick="pickWinner(43,'Senegal','Norway')">Senegal</button>
+      </div>
+      <div class="match-info"><span class="match-time">8:00 PM</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div>
+    </div>
+    <div class="match g-J" id="match-44">
+      <span class="match-num">44</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="44" data-team="Jordan" onclick="pickWinner(44,'Jordan','Algeria')">Jordan</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="44" data-team="Algeria" onclick="pickWinner(44,'Algeria','Jordan')">Algeria</button>
+      </div>
+      <div class="match-info"><span class="match-time">11:00 PM</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Tuesday · June 23</div>
+  <div class="matches">
+    <div class="match g-K" id="match-45">
+      <span class="match-num">45</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="45" data-team="Portugal" onclick="pickWinner(45,'Portugal','Uzbekistan')">Portugal</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="45" data-team="Uzbekistan" onclick="pickWinner(45,'Uzbekistan','Portugal')">Uzbekistan</button>
+      </div>
+      <div class="match-info"><span class="match-time">1:00 PM</span><span class="match-venue">NRG Stadium, Houston</span></div>
+    </div>
+    <div class="match g-L" id="match-46">
+      <span class="match-num">46</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="46" data-team="England" onclick="pickWinner(46,'England','Ghana')">England</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="46" data-team="Ghana" onclick="pickWinner(46,'Ghana','England')">Ghana</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">Gillette Stadium, Foxborough</span></div>
+    </div>
+    <div class="match g-L" id="match-47">
+      <span class="match-num">47</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="47" data-team="Panama" onclick="pickWinner(47,'Panama','Croatia')">Panama</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="47" data-team="Croatia" onclick="pickWinner(47,'Croatia','Panama')">Croatia</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:00 PM</span><span class="match-venue">BMO Field, Toronto</span></div>
+    </div>
+    <div class="match g-K" id="match-48">
+      <span class="match-num">48</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="48" data-team="Colombia" onclick="pickWinner(48,'Colombia','DR Congo')">Colombia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="48" data-team="DR Congo" onclick="pickWinner(48,'DR Congo','Colombia')">DR Congo</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Estadio Akron, Zapopan</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Wednesday · June 24 · Final Matchday — Groups A, B, C</div>
+  <div class="matches">
+    <div class="match g-B" id="match-49">
+      <span class="match-num">49</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="49" data-team="Switzerland" onclick="pickWinner(49,'Switzerland','Canada')">Switzerland</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="49" data-team="Canada" onclick="pickWinner(49,'Canada','Switzerland')">Canada</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">BC Place, Vancouver</span></div>
+    </div>
+    <div class="match g-B" id="match-50">
+      <span class="match-num">50</span><span class="group-tag" style="background:var(--gb)">GROUP B</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="50" data-team="Bosnia &amp; Herzegovina" onclick="pickWinner(50,'Bosnia &amp; Herzegovina','Qatar')">Bosnia &amp; Herzegovina</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="50" data-team="Qatar" onclick="pickWinner(50,'Qatar','Bosnia &amp; Herzegovina')">Qatar</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Lumen Field, Seattle</span></div>
+    </div>
+    <div class="match g-C" id="match-51">
+      <span class="match-num">51</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="51" data-team="Scotland" onclick="pickWinner(51,'Scotland','Brazil')">Scotland</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="51" data-team="Brazil" onclick="pickWinner(51,'Brazil','Scotland')">Brazil</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div>
+    </div>
+    <div class="match g-C" id="match-52">
+      <span class="match-num">52</span><span class="group-tag" style="background:var(--gc)">GROUP C</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="52" data-team="Morocco" onclick="pickWinner(52,'Morocco','Haiti')">Morocco</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="52" data-team="Haiti" onclick="pickWinner(52,'Haiti','Morocco')">Haiti</button>
+      </div>
+      <div class="match-info"><span class="match-time">6:00 PM</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div>
+    </div>
+    <div class="match g-A" id="match-53">
+      <span class="match-num">53</span><span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="53" data-team="Czechia" onclick="pickWinner(53,'Czechia','Mexico')">Czechia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="53" data-team="Mexico" onclick="pickWinner(53,'Mexico','Czechia')">Mexico</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">Estadio Azteca, Mexico City</span></div>
+    </div>
+    <div class="match g-A" id="match-54">
+      <span class="match-num">54</span><span class="group-tag" style="background:var(--ga)">GROUP A</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="54" data-team="South Africa" onclick="pickWinner(54,'South Africa','South Korea')">South Africa</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="54" data-team="South Korea" onclick="pickWinner(54,'South Korea','South Africa')">South Korea</button>
+      </div>
+      <div class="match-info"><span class="match-time">9:00 PM</span><span class="match-venue">Estadio BBVA, Monterrey</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Thursday · June 25 · Final Matchday — Groups D, E, F</div>
+  <div class="matches">
+    <div class="match g-E" id="match-55">
+      <span class="match-num">55</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="55" data-team="Curaçao" onclick="pickWinner(55,'Curaçao','Ivory Coast')">Curaçao</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="55" data-team="Ivory Coast" onclick="pickWinner(55,'Ivory Coast','Curaçao')">Ivory Coast</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div>
+    </div>
+    <div class="match g-E" id="match-56">
+      <span class="match-num">56</span><span class="group-tag" style="background:var(--ge)">GROUP E</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="56" data-team="Ecuador" onclick="pickWinner(56,'Ecuador','Germany')">Ecuador</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="56" data-team="Germany" onclick="pickWinner(56,'Germany','Ecuador')">Germany</button>
+      </div>
+      <div class="match-info"><span class="match-time">4:00 PM</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div>
+    </div>
+    <div class="match g-F" id="match-57">
+      <span class="match-num">57</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="57" data-team="Japan" onclick="pickWinner(57,'Japan','Sweden')">Japan</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="57" data-team="Sweden" onclick="pickWinner(57,'Sweden','Japan')">Sweden</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:00 PM</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div>
+    </div>
+    <div class="match g-F" id="match-58">
+      <span class="match-num">58</span><span class="group-tag" style="background:var(--gf)">GROUP F</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="58" data-team="Tunisia" onclick="pickWinner(58,'Tunisia','Netherlands')">Tunisia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="58" data-team="Netherlands" onclick="pickWinner(58,'Netherlands','Tunisia')">Netherlands</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:00 PM</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div>
+    </div>
+    <div class="match g-D" id="match-59">
+      <span class="match-num">59</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="59" data-team="Türkiye" onclick="pickWinner(59,'Türkiye','USA')">Türkiye</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="59" data-team="USA" onclick="pickWinner(59,'USA','Türkiye')">USA</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">SoFi Stadium, Inglewood</span></div>
+    </div>
+    <div class="match g-D" id="match-60">
+      <span class="match-num">60</span><span class="group-tag" style="background:var(--gd)">GROUP D</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="60" data-team="Paraguay" onclick="pickWinner(60,'Paraguay','Australia')">Paraguay</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="60" data-team="Australia" onclick="pickWinner(60,'Australia','Paraguay')">Australia</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Friday · June 26 · Final Matchday — Groups G, H, I</div>
+  <div class="matches">
+    <div class="match g-I" id="match-61">
+      <span class="match-num">61</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="61" data-team="Norway" onclick="pickWinner(61,'Norway','France')">Norway</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="61" data-team="France" onclick="pickWinner(61,'France','Norway')">France</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">Gillette Stadium, Foxborough</span></div>
+    </div>
+    <div class="match g-I" id="match-62">
+      <span class="match-num">62</span><span class="group-tag" style="background:var(--gi)">GROUP I</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="62" data-team="Senegal" onclick="pickWinner(62,'Senegal','Iraq')">Senegal</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="62" data-team="Iraq" onclick="pickWinner(62,'Iraq','Senegal')">Iraq</button>
+      </div>
+      <div class="match-info"><span class="match-time">3:00 PM</span><span class="match-venue">BMO Field, Toronto</span></div>
+    </div>
+    <div class="match g-H" id="match-63">
+      <span class="match-num">63</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="63" data-team="Cape Verde" onclick="pickWinner(63,'Cape Verde','Saudi Arabia')">Cape Verde</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="63" data-team="Saudi Arabia" onclick="pickWinner(63,'Saudi Arabia','Cape Verde')">Saudi Arabia</button>
+      </div>
+      <div class="match-info"><span class="match-time">8:00 PM</span><span class="match-venue">NRG Stadium, Houston</span></div>
+    </div>
+    <div class="match g-H" id="match-64">
+      <span class="match-num">64</span><span class="group-tag" style="background:var(--gh)">GROUP H</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="64" data-team="Uruguay" onclick="pickWinner(64,'Uruguay','Spain')">Uruguay</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="64" data-team="Spain" onclick="pickWinner(64,'Spain','Uruguay')">Spain</button>
+      </div>
+      <div class="match-info"><span class="match-time">8:00 PM</span><span class="match-venue">Estadio Akron, Zapopan</span></div>
+    </div>
+    <div class="match g-G" id="match-65">
+      <span class="match-num">65</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="65" data-team="Egypt" onclick="pickWinner(65,'Egypt','Iran')">Egypt</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="65" data-team="Iran" onclick="pickWinner(65,'Iran','Egypt')">Iran</button>
+      </div>
+      <div class="match-info"><span class="match-time">11:00 PM</span><span class="match-venue">Lumen Field, Seattle</span></div>
+    </div>
+    <div class="match g-G" id="match-66">
+      <span class="match-num">66</span><span class="group-tag" style="background:var(--gg)">GROUP G</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="66" data-team="New Zealand" onclick="pickWinner(66,'New Zealand','Belgium')">New Zealand</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="66" data-team="Belgium" onclick="pickWinner(66,'Belgium','New Zealand')">Belgium</button>
+      </div>
+      <div class="match-info"><span class="match-time">11:00 PM</span><span class="match-venue">BC Place, Vancouver</span></div>
+    </div>
+  </div>
+
+  <div class="day-label">Saturday · June 27 · Final Matchday — Groups J, K, L</div>
+  <div class="matches">
+    <div class="match g-L" id="match-67">
+      <span class="match-num">67</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="67" data-team="Panama" onclick="pickWinner(67,'Panama','England')">Panama</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="67" data-team="England" onclick="pickWinner(67,'England','Panama')">England</button>
+      </div>
+      <div class="match-info"><span class="match-time">5:00 PM</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div>
+    </div>
+    <div class="match g-L" id="match-68">
+      <span class="match-num">68</span><span class="group-tag" style="background:var(--gl)">GROUP L</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="68" data-team="Croatia" onclick="pickWinner(68,'Croatia','Ghana')">Croatia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="68" data-team="Ghana" onclick="pickWinner(68,'Ghana','Croatia')">Ghana</button>
+      </div>
+      <div class="match-info"><span class="match-time">5:00 PM</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div>
+    </div>
+    <div class="match g-K" id="match-69">
+      <span class="match-num">69</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="69" data-team="Colombia" onclick="pickWinner(69,'Colombia','Portugal')">Colombia</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="69" data-team="Portugal" onclick="pickWinner(69,'Portugal','Colombia')">Portugal</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:30 PM</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div>
+    </div>
+    <div class="match g-K" id="match-70">
+      <span class="match-num">70</span><span class="group-tag" style="background:var(--gk)">GROUP K</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="70" data-team="DR Congo" onclick="pickWinner(70,'DR Congo','Uzbekistan')">DR Congo</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="70" data-team="Uzbekistan" onclick="pickWinner(70,'Uzbekistan','DR Congo')">Uzbekistan</button>
+      </div>
+      <div class="match-info"><span class="match-time">7:30 PM</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div>
+    </div>
+    <div class="match g-J" id="match-71">
+      <span class="match-num">71</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="71" data-team="Algeria" onclick="pickWinner(71,'Algeria','Austria')">Algeria</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="71" data-team="Austria" onclick="pickWinner(71,'Austria','Algeria')">Austria</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div>
+    </div>
+    <div class="match g-J" id="match-72">
+      <span class="match-num">72</span><span class="group-tag" style="background:var(--gj)">GROUP J</span>
+      <div class="match-teams">
+        <button class="team-btn" data-match="72" data-team="Jordan" onclick="pickWinner(72,'Jordan','Argentina')">Jordan</button>
+        <span class="vs-sep">vs</span>
+        <button class="team-btn" data-match="72" data-team="Argentina" onclick="pickWinner(72,'Argentina','Jordan')">Argentina</button>
+      </div>
+      <div class="match-info"><span class="match-time">10:00 PM</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ROUND OF 32 ═══ -->
+<section id="round32">
+  <div class="stage-header">
+    <span class="stage-badge">Phase 2</span>
+    <h2 class="stage-title">Round of 32</h2>
+    <span class="stage-dates">Jun 28 – Jul 3</span>
+  </div>
+  <p class="ko-note">New for 2026 — the first ever Round of 32. Win or go home from here on out. Pick winners above in the Group Stage to populate these slots.</p>
+  <div class="matches">
+    <div class="match g-R32" id="match-73"><span class="match-num">73</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m73-home">Runner-up A</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m73-away">Runner-up B</button></div><div class="match-info"><span class="match-time">3:00 PM · Sun Jun 28</span><span class="match-venue">SoFi Stadium, Inglewood</span></div></div>
+    <div class="match g-R32" id="match-74"><span class="match-num">74</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m74-home">Winner E</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m74-away">Best 3rd A/B/C/D/F</button></div><div class="match-info"><span class="match-time">4:30 PM · Mon Jun 29</span><span class="match-venue">Gillette Stadium, Foxborough</span></div></div>
+    <div class="match g-R32" id="match-75"><span class="match-num">75</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m75-home">Winner F</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m75-away">Runner-up C</button></div><div class="match-info"><span class="match-time">9:00 PM · Mon Jun 29</span><span class="match-venue">Estadio BBVA, Monterrey</span></div></div>
+    <div class="match g-R32" id="match-76"><span class="match-num">76</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m76-home">Winner C</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m76-away">Runner-up F</button></div><div class="match-info"><span class="match-time">1:00 PM · Mon Jun 29</span><span class="match-venue">NRG Stadium, Houston</span></div></div>
+    <div class="match g-R32" id="match-77"><span class="match-num">77</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m77-home">Winner I</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m77-away">Best 3rd C/D/F/G/H</button></div><div class="match-info"><span class="match-time">5:00 PM · Tue Jun 30</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div></div>
+    <div class="match g-R32" id="match-78"><span class="match-num">78</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m78-home">Runner-up E</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m78-away">Runner-up I</button></div><div class="match-info"><span class="match-time">1:00 PM · Tue Jun 30</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div></div>
+    <div class="match g-R32" id="match-79"><span class="match-num">79</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m79-home">Winner A</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m79-away">Best 3rd C/E/F/H/I</button></div><div class="match-info"><span class="match-time">9:00 PM · Tue Jun 30</span><span class="match-venue">Estadio Azteca, Mexico City</span></div></div>
+    <div class="match g-R32" id="match-80"><span class="match-num">80</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m80-home">Winner L</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m80-away">Best 3rd E/H/I/J/K</button></div><div class="match-info"><span class="match-time">12:00 PM · Wed Jul 1</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div></div>
+    <div class="match g-R32" id="match-81"><span class="match-num">81</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m81-home">Winner D</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m81-away">Best 3rd B/E/F/I/J</button></div><div class="match-info"><span class="match-time">8:00 PM · Wed Jul 1</span><span class="match-venue">Levi's Stadium, Santa Clara</span></div></div>
+    <div class="match g-R32" id="match-82"><span class="match-num">82</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m82-home">Winner G</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m82-away">Best 3rd A/E/H/I/J</button></div><div class="match-info"><span class="match-time">4:00 PM · Wed Jul 1</span><span class="match-venue">Lumen Field, Seattle</span></div></div>
+    <div class="match g-R32" id="match-83"><span class="match-num">83</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m83-home">Runner-up K</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m83-away">Runner-up L</button></div><div class="match-info"><span class="match-time">7:00 PM · Thu Jul 2</span><span class="match-venue">BMO Field, Toronto</span></div></div>
+    <div class="match g-R32" id="match-84"><span class="match-num">84</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m84-home">Winner H</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m84-away">Runner-up J</button></div><div class="match-info"><span class="match-time">3:00 PM · Thu Jul 2</span><span class="match-venue">SoFi Stadium, Inglewood</span></div></div>
+    <div class="match g-R32" id="match-85"><span class="match-num">85</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m85-home">Winner B</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m85-away">Best 3rd E/F/G/I/J</button></div><div class="match-info"><span class="match-time">11:00 PM · Thu Jul 2</span><span class="match-venue">BC Place, Vancouver</span></div></div>
+    <div class="match g-R32" id="match-86"><span class="match-num">86</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m86-home">Winner J</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m86-away">Runner-up H</button></div><div class="match-info"><span class="match-time">6:00 PM · Fri Jul 3</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div></div>
+    <div class="match g-R32" id="match-87"><span class="match-num">87</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m87-home">Winner K</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m87-away">Best 3rd D/E/I/J/L</button></div><div class="match-info"><span class="match-time">9:30 PM · Fri Jul 3</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div></div>
+    <div class="match g-R32" id="match-88"><span class="match-num">88</span><span class="group-tag" style="background:#3a3a32">R32</span><div class="match-teams"><button class="team-btn tbd" disabled id="m88-home">Runner-up D</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m88-away">Runner-up G</button></div><div class="match-info"><span class="match-time">2:00 PM · Fri Jul 3</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ ROUND OF 16 ═══ -->
+<section id="round16">
+  <div class="stage-header"><span class="stage-badge">Phase 3</span><h2 class="stage-title">Round of 16</h2><span class="stage-dates">Jul 4 – Jul 7</span></div>
+  <div class="matches">
+    <div class="match g-R16" id="match-89"><span class="match-num">89</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m89-home">Winner M74</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m89-away">Winner M77</button></div><div class="match-info"><span class="match-time">5:00 PM · Sat Jul 4</span><span class="match-venue">Lincoln Financial Field, Philadelphia</span></div></div>
+    <div class="match g-R16" id="match-90"><span class="match-num">90</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m90-home">Winner M73</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m90-away">Winner M75</button></div><div class="match-info"><span class="match-time">1:00 PM · Sat Jul 4</span><span class="match-venue">NRG Stadium, Houston</span></div></div>
+    <div class="match g-R16" id="match-91"><span class="match-num">91</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m91-home">Winner M76</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m91-away">Winner M78</button></div><div class="match-info"><span class="match-time">4:00 PM · Sun Jul 5</span><span class="match-venue">MetLife Stadium, East Rutherford</span></div></div>
+    <div class="match g-R16" id="match-92"><span class="match-num">92</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m92-home">Winner M79</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m92-away">Winner M80</button></div><div class="match-info"><span class="match-time">8:00 PM · Sun Jul 5</span><span class="match-venue">Estadio Azteca, Mexico City</span></div></div>
+    <div class="match g-R16" id="match-93"><span class="match-num">93</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m93-home">Winner M83</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m93-away">Winner M84</button></div><div class="match-info"><span class="match-time">3:00 PM · Mon Jul 6</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div></div>
+    <div class="match g-R16" id="match-94"><span class="match-num">94</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m94-home">Winner M81</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m94-away">Winner M82</button></div><div class="match-info"><span class="match-time">8:00 PM · Mon Jul 6</span><span class="match-venue">Lumen Field, Seattle</span></div></div>
+    <div class="match g-R16" id="match-95"><span class="match-num">95</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m95-home">Winner M86</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m95-away">Winner M88</button></div><div class="match-info"><span class="match-time">12:00 PM · Tue Jul 7</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div></div>
+    <div class="match g-R16" id="match-96"><span class="match-num">96</span><span class="group-tag" style="background:#1a3a5e">R16</span><div class="match-teams"><button class="team-btn tbd" disabled id="m96-home">Winner M85</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m96-away">Winner M87</button></div><div class="match-info"><span class="match-time">4:00 PM · Tue Jul 7</span><span class="match-venue">BC Place, Vancouver</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ QUARTERFINALS ═══ -->
+<section id="quarters">
+  <div class="stage-header"><span class="stage-badge">Phase 4</span><h2 class="stage-title">Quarterfinals</h2><span class="stage-dates">Jul 9 – Jul 11</span></div>
+  <div class="matches">
+    <div class="match g-QF" id="match-97"><span class="match-num">97</span><span class="group-tag" style="background:#5e3a1a">QF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m97-home">Winner M89</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m97-away">Winner M90</button></div><div class="match-info"><span class="match-time">4:00 PM · Thu Jul 9</span><span class="match-venue">Gillette Stadium, Foxborough</span></div></div>
+    <div class="match g-QF" id="match-98"><span class="match-num">98</span><span class="group-tag" style="background:#5e3a1a">QF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m98-home">Winner M93</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m98-away">Winner M94</button></div><div class="match-info"><span class="match-time">3:00 PM · Fri Jul 10</span><span class="match-venue">SoFi Stadium, Inglewood</span></div></div>
+    <div class="match g-QF" id="match-99"><span class="match-num">99</span><span class="group-tag" style="background:#5e3a1a">QF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m99-home">Winner M91</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m99-away">Winner M92</button></div><div class="match-info"><span class="match-time">5:00 PM · Sat Jul 11</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div></div>
+    <div class="match g-QF" id="match-100"><span class="match-num">100</span><span class="group-tag" style="background:#5e3a1a">QF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m100-home">Winner M95</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m100-away">Winner M96</button></div><div class="match-info"><span class="match-time">9:00 PM · Sat Jul 11</span><span class="match-venue">Arrowhead Stadium, Kansas City</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ SEMIFINALS ═══ -->
+<section id="semis">
+  <div class="stage-header"><span class="stage-badge">Phase 5</span><h2 class="stage-title">Semifinals</h2><span class="stage-dates">Jul 14 – Jul 15</span></div>
+  <div class="matches">
+    <div class="match g-SF" id="match-101"><span class="match-num">101</span><span class="group-tag" style="background:#1a5e3a">SF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m101-home">Winner M97</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m101-away">Winner M98</button></div><div class="match-info"><span class="match-time">3:00 PM · Tue Jul 14</span><span class="match-venue">AT&amp;T Stadium, Arlington</span></div></div>
+    <div class="match g-SF" id="match-102"><span class="match-num">102</span><span class="group-tag" style="background:#1a5e3a">SF</span><div class="match-teams"><button class="team-btn tbd" disabled id="m102-home">Winner M99</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m102-away">Winner M100</button></div><div class="match-info"><span class="match-time">3:00 PM · Wed Jul 15</span><span class="match-venue">Mercedes-Benz Stadium, Atlanta</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ THIRD PLACE ═══ -->
+<section id="third">
+  <div class="stage-header"><span class="stage-badge">Phase 6</span><h2 class="stage-title">Third-Place Match</h2><span class="stage-dates">Jul 18</span></div>
+  <div class="matches">
+    <div class="match g-3PL" id="match-103"><span class="match-num">103</span><span class="group-tag" style="background:#5e1a3a">3PL</span><div class="match-teams"><button class="team-btn tbd" disabled id="m103-home">Loser M101</button><span class="vs-sep">vs</span><button class="team-btn tbd" disabled id="m103-away">Loser M102</button></div><div class="match-info"><span class="match-time">5:00 PM · Sat Jul 18</span><span class="match-venue">Hard Rock Stadium, Miami Gardens</span></div></div>
+  </div>
+</section>
+
+<!-- ═══ FINAL ═══ -->
+<section id="final">
+  <div class="stage-header"><span class="stage-badge">Phase 7</span><h2 class="stage-title">World Cup Final</h2><span class="stage-dates">Jul 19</span></div>
+  <div class="final-card">
+    <div class="final-date">SUNDAY · JULY 19, 2026 · MATCH 104</div>
+    <div class="final-teams">
+      <button class="final-team-btn tbd" disabled id="m104-home">Winner SF1</button>
+      <span class="final-vs">vs</span>
+      <button class="final-team-btn tbd" disabled id="m104-away">Winner SF2</button>
+    </div>
+    <div class="final-venue">MetLife Stadium · East Rutherford, New Jersey</div>
+    <div class="final-time">Kickoff: 3:00 PM ET</div>
+    <div class="champion-banner" id="champion-banner">🏆 WORLD CHAMPION 🏆</div>
+  </div>
+</section>
+
+</main>
+<footer>Data sourced from FIFA · Fox Sports · NBC Sports · All times Eastern (ET) · Schedule current as of June 11, 2026</footer>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+// winners[matchId] = teamName | null
+const winners = {};
+
+// ─── BRACKET PROPAGATION MAP ─────────────────────────────────────────────────
+// For each match, when a winner is picked, which slot(s) does it flow into?
+// Format: { matchId: [{targetId, slot}] }
+// slot: 'home' | 'away'
+// Note: group stage → R32 uses group-level logic (winner/runner-up)
+// For simplicity, we track group standings separately for groups that matter
+
+// Direct knockout propagation (R32 → R16 → QF → SF → Final + 3rd place):
+const propagate = {
+  73:  [{to:90, slot:'home'}],
+  74:  [{to:89, slot:'home'}],
+  75:  [{to:90, slot:'away'}],
+  76:  [{to:91, slot:'home'}],
+  77:  [{to:89, slot:'away'}],
+  78:  [{to:91, slot:'away'}],
+  79:  [{to:92, slot:'home'}],
+  80:  [{to:92, slot:'away'}],
+  81:  [{to:94, slot:'home'}],
+  82:  [{to:94, slot:'away'}],
+  83:  [{to:93, slot:'home'}],
+  84:  [{to:93, slot:'away'}],
+  85:  [{to:96, slot:'home'}],
+  86:  [{to:95, slot:'home'}],
+  87:  [{to:96, slot:'away'}],
+  88:  [{to:95, slot:'away'}],
+  89:  [{to:97, slot:'home'}],
+  90:  [{to:97, slot:'away'}],
+  91:  [{to:99, slot:'home'}],
+  92:  [{to:99, slot:'away'}],
+  93:  [{to:98, slot:'home'}],
+  94:  [{to:98, slot:'away'}],
+  95:  [{to:100, slot:'home'}],
+  96:  [{to:100, slot:'away'}],
+  97:  [{to:101, slot:'home'}, {loserTo:103, loserSlot:'home'}],
+  98:  [{to:101, slot:'away'}, {loserTo:103, loserSlot:'away'}],  // wait — 101 is SF1
+  99:  [{to:102, slot:'home'}, {loserTo:103, loserSlot:'home'}],
+  100: [{to:102, slot:'away'}, {loserTo:103, loserSlot:'away'}],
+  101: [{to:104, slot:'home'}],
+  102: [{to:104, slot:'away'}],
+};
+
+// Fix: SF losers go to match 103 correctly
+// SF1 (101) loser → m103-home; SF2 (102) loser → m103-away
+// We'll handle this in pickWinner separately for SF
+
+// Group-stage winner/runner-up assignments into R32 slots:
+// We define which R32 slots each group's winner/runner-up populates
+// Based on the official R32 bracket
+const groupR32Slots = {
+  // R32 match id → { home: {type, group}, away: {type, group} }
+  73:  { home:{type:'runner-up',group:'A'}, away:{type:'runner-up',group:'B'} },
+  74:  { home:{type:'winner',  group:'E'}, away:{type:'3rd',groups:'A/B/C/D/F'} },
+  75:  { home:{type:'winner',  group:'F'}, away:{type:'runner-up',group:'C'} },
+  76:  { home:{type:'winner',  group:'C'}, away:{type:'runner-up',group:'F'} },
+  77:  { home:{type:'winner',  group:'I'}, away:{type:'3rd',groups:'C/D/F/G/H'} },
+  78:  { home:{type:'runner-up',group:'E'}, away:{type:'runner-up',group:'I'} },
+  79:  { home:{type:'winner',  group:'A'}, away:{type:'3rd',groups:'C/E/F/H/I'} },
+  80:  { home:{type:'winner',  group:'L'}, away:{type:'3rd',groups:'E/H/I/J/K'} },
+  81:  { home:{type:'winner',  group:'D'}, away:{type:'3rd',groups:'B/E/F/I/J'} },
+  82:  { home:{type:'winner',  group:'G'}, away:{type:'3rd',groups:'A/E/H/I/J'} },
+  83:  { home:{type:'runner-up',group:'K'}, away:{type:'runner-up',group:'L'} },
+  84:  { home:{type:'winner',  group:'H'}, away:{type:'runner-up',group:'J'} },
+  85:  { home:{type:'winner',  group:'B'}, away:{type:'3rd',groups:'E/F/G/I/J'} },
+  86:  { home:{type:'winner',  group:'J'}, away:{type:'runner-up',group:'H'} },
+  87:  { home:{type:'winner',  group:'K'}, away:{type:'3rd',groups:'D/E/I/J/L'} },
+  88:  { home:{type:'runner-up',group:'D'}, away:{type:'runner-up',group:'G'} },
+};
+
+// Track group standings: groupStandings[group] = {winner: team|null, runnerUp: team|null}
+// We'll compute this from match results (simplified: last winner per group match decides)
+// For the group stage we only allow picking group-stage match winners which auto-populate R32
+
+// Group match membership: matchId → group letter
+const matchGroup = {
+  1:'A',2:'A',25:'A',28:'A',53:'A',54:'A',
+  3:'B',5:'B',26:'B',27:'B',49:'B',50:'B',
+  6:'C',7:'C',30:'C',31:'C',51:'C',52:'C',
+  4:'D',8:'D',29:'D',32:'D',59:'D',60:'D',
+  9:'E',11:'E',34:'E',35:'E',55:'E',56:'E',
+  10:'F',12:'F',33:'F',36:'F',57:'F',58:'F',
+  14:'G',16:'G',38:'G',40:'G',65:'G',66:'G',
+  13:'H',15:'H',37:'H',39:'H',63:'H',64:'H',
+  17:'I',18:'I',42:'I',43:'I',61:'I',62:'I',
+  19:'J',20:'J',41:'J',44:'J',71:'J',72:'J',
+  21:'K',24:'K',45:'K',48:'K',69:'K',70:'K',
+  22:'L',23:'L',46:'L',47:'L',67:'L',68:'L',
+};
+
+// Group standings (simplified: winner of the LAST match per group = group winner for R32 population)
+// Actually: we track per-group a 'decided' state from the final matchday matches
+// Final matchday matches per group:
+const groupFinalMatches = {
+  A:[53,54], B:[49,50], C:[51,52], D:[59,60], E:[55,56], F:[57,58],
+  G:[65,66], H:[63,64], I:[61,62], J:[71,72], K:[69,70], L:[67,68],
+};
+
+// Which group final match determines winner/runner-up?
+// We use a simple heuristic: last match picked winner
+// groupSlots[group] = {winner: team, runnerUp: team}
+const groupSlots = {};
+'ABCDEFGHIJKL'.split('').forEach(g => groupSlots[g] = {winner:null, runnerUp:null});
+
+// ─── PICK WINNER ─────────────────────────────────────────────────────────────
+function pickWinner(matchId, team, opponent) {
+  const current = winners[matchId];
+  // Toggle off if same team clicked
+  if (current === team) {
+    clearWinner(matchId);
+    return;
+  }
+  // Set winner
+  winners[matchId] = team;
+  renderMatch(matchId, team, opponent);
+
+  // Propagate forward
+  if (matchId >= 73 && matchId <= 102) {
+    // Knockout stage — direct propagation
+    const rules = propagate[matchId];
+    if (rules) {
+      rules.forEach(r => {
+        if (r.to) setKOSlot(r.to, r.slot, team);
+        if (r.loserTo) setKOSlot(r.loserTo, r.loserSlot, opponent);
+      });
+    }
+    // Special: SF losers to 3rd place
+    if (matchId === 97) setKOSlot(103, 'home', opponent);
+    if (matchId === 98) setKOSlot(103, 'away', opponent); // wait, 97+98 are QFs not SFs
+  }
+
+  if (matchId === 99) setKOSlot(103, 'home', opponent);
+  if (matchId === 100) setKOSlot(103, 'away', opponent);
+  if (matchId === 101) { setKOSlot(104, 'home', team); setKOSlot(103, 'home', opponent); }
+  if (matchId === 102) { setKOSlot(104, 'away', team); setKOSlot(103, 'away', opponent); }
+
+  // Final champion
+  if (matchId === 104) {
+    // just visual — handled in renderFinal
+    renderFinal(team);
+  }
+
+  // Group stage → populate R32 slots based on group membership
+  if (matchId <= 72) {
+    updateGroupR32(matchId, team, opponent);
+  }
+
+  saveState();
+}
+
+function clearWinner(matchId) {
+  delete winners[matchId];
+  // Re-render match as unset
+  const btns = document.querySelectorAll(`[data-match="${matchId}"]`);
+  btns.forEach(b => {
+    b.classList.remove('winner','loser');
+    b.disabled = false;
+  });
+  // Clear downstream — find all matches this feeds into and clear them
+  clearDownstream(matchId);
+  saveState();
+}
+
+function clearDownstream(matchId) {
+  const rules = propagate[matchId] || [];
+  rules.forEach(r => {
+    if (r.to && winners[r.to] !== undefined) clearWinner(r.to);
+    // clear the slot even if no winner yet
+    if (r.to) clearKOSlot(r.to, r.slot);
+    if (r.loserTo) clearKOSlot(r.loserTo, r.loserSlot);
+  });
+  if (matchId === 99) clearKOSlot(103, 'home');
+  if (matchId === 100) clearKOSlot(103, 'away');
+  if (matchId === 101) { clearKOSlot(104, 'home'); clearKOSlot(103, 'home'); }
+  if (matchId === 102) { clearKOSlot(104, 'away'); clearKOSlot(103, 'away'); }
+  if (matchId === 104) { document.getElementById('champion-banner').classList.remove('visible'); }
+  // Group stage downstream
+  if (matchId <= 72) {
+    const group = matchGroup[matchId];
+    if (group) recomputeGroupR32(group);
+  }
+}
+
+function renderMatch(matchId, winner, loser) {
+  const btns = document.querySelectorAll(`[data-match="${matchId}"]`);
+  btns.forEach(b => {
+    const t = b.dataset.team;
+    b.classList.remove('winner','loser','tbd');
+    if (t === winner) { b.classList.add('winner'); b.disabled = false; }
+    else if (t === loser) { b.classList.add('loser'); b.disabled = true; }
+  });
+}
+
+function setKOSlot(matchId, slot, team) {
+  const el = document.getElementById(`m${matchId}-${slot}`);
+  if (!el) return;
+  el.textContent = team;
+  el.classList.remove('tbd','winner','loser');
+  el.dataset.team = team;
+  el.disabled = false;
+  // Wire up onclick
+  const other = slot === 'home' ? 'away' : 'home';
+  const otherEl = document.getElementById(`m${matchId}-${other}`);
+  const otherTeam = otherEl ? otherEl.dataset.team : null;
+  if (otherTeam && !otherEl.classList.contains('tbd')) {
+    el.onclick = () => pickWinner(matchId, team, otherTeam);
+    otherEl.onclick = () => pickWinner(matchId, otherTeam, team);
+  } else {
+    el.onclick = null; // wait for other side
+  }
+  // If match already had a winner, clear it
+  if (winners[matchId]) clearWinner(matchId);
+}
+
+function clearKOSlot(matchId, slot) {
+  const el = document.getElementById(`m${matchId}-${slot}`);
+  if (!el) return;
+  const defaults = {
+    'm73-home':'Runner-up A','m73-away':'Runner-up B',
+    'm74-home':'Winner E','m74-away':'Best 3rd A/B/C/D/F',
+    'm75-home':'Winner F','m75-away':'Runner-up C',
+    'm76-home':'Winner C','m76-away':'Runner-up F',
+    'm77-home':'Winner I','m77-away':'Best 3rd C/D/F/G/H',
+    'm78-home':'Runner-up E','m78-away':'Runner-up I',
+    'm79-home':'Winner A','m79-away':'Best 3rd C/E/F/H/I',
+    'm80-home':'Winner L','m80-away':'Best 3rd E/H/I/J/K',
+    'm81-home':'Winner D','m81-away':'Best 3rd B/E/F/I/J',
+    'm82-home':'Winner G','m82-away':'Best 3rd A/E/H/I/J',
+    'm83-home':'Runner-up K','m83-away':'Runner-up L',
+    'm84-home':'Winner H','m84-away':'Runner-up J',
+    'm85-home':'Winner B','m85-away':'Best 3rd E/F/G/I/J',
+    'm86-home':'Winner J','m86-away':'Runner-up H',
+    'm87-home':'Winner K','m87-away':'Best 3rd D/E/I/J/L',
+    'm88-home':'Runner-up D','m88-away':'Runner-up G',
+    'm89-home':'Winner M74','m89-away':'Winner M77',
+    'm90-home':'Winner M73','m90-away':'Winner M75',
+    'm91-home':'Winner M76','m91-away':'Winner M78',
+    'm92-home':'Winner M79','m92-away':'Winner M80',
+    'm93-home':'Winner M83','m93-away':'Winner M84',
+    'm94-home':'Winner M81','m94-away':'Winner M82',
+    'm95-home':'Winner M86','m95-away':'Winner M88',
+    'm96-home':'Winner M85','m96-away':'Winner M87',
+    'm97-home':'Winner M89','m97-away':'Winner M90',
+    'm98-home':'Winner M93','m98-away':'Winner M94',
+    'm99-home':'Winner M91','m99-away':'Winner M92',
+    'm100-home':'Winner M95','m100-away':'Winner M96',
+    'm101-home':'Winner M97','m101-away':'Winner M98',
+    'm102-home':'Winner M99','m102-away':'Winner M100',
+    'm103-home':'Loser M101','m103-away':'Loser M102',
+    'm104-home':'Winner SF1','m104-away':'Winner SF2',
+  };
+  const key = `m${matchId}-${slot}`;
+  el.textContent = defaults[key] || '?';
+  el.classList.add('tbd');
+  el.classList.remove('winner','loser');
+  el.disabled = true;
+  el.dataset.team = '';
+  el.onclick = null;
+  if (matchId === 104) {
+    el.classList.add('tbd');
+    document.getElementById('champion-banner').classList.remove('visible');
+  }
+}
+
+function renderFinal(champion) {
+  const banner = document.getElementById('champion-banner');
+  banner.textContent = `🏆 ${champion.toUpperCase()} — WORLD CHAMPION 🏆`;
+  banner.classList.add('visible');
+  // Style winner button
+  const home = document.getElementById('m104-home');
+  const away = document.getElementById('m104-away');
+  if (home && away) {
+    if (home.dataset.team === champion) {
+      home.classList.add('winner'); away.classList.add('loser'); away.disabled = true;
+      home.onclick = () => pickWinner(104, champion, away.dataset.team);
+    } else {
+      away.classList.add('winner'); home.classList.add('loser'); home.disabled = true;
+      away.onclick = () => pickWinner(104, champion, home.dataset.team);
+    }
+  }
+}
+
+// ─── GROUP STAGE → R32 PROPAGATION ──────────────────────────────────────────
+// We track how many wins each team has per group from the final matchday
+// Simple: each team in group participates in final matchday; we pick the winner slot
+// For now: we map group final match winners directly to R32 'winner' and 'runner-up' slots
+
+function updateGroupR32(matchId, winner, loser) {
+  const group = matchGroup[matchId];
+  if (!group) return;
+  recomputeGroupR32(group);
+}
+
+function recomputeGroupR32(group) {
+  // Find which final-matchday matches for this group are decided
+  const finalMs = groupFinalMatches[group] || [];
+  const decided = finalMs.filter(m => winners[m]);
+  // Simple heuristic: we derive winner/runner-up from final matchday results
+  // Since we can't do full standings without goal diff, we use:
+  // If both final matches decided, the two winners compete for group winner (we pick whichever won their match)
+  // winner = winner of one final match (match A), runner-up = winner of other (match B) — simplistic but functional
+  let gWinner = null, gRunnerUp = null;
+  if (decided.length >= 1) {
+    gWinner = winners[finalMs[0]] || null;
+  }
+  if (decided.length >= 2) {
+    gRunnerUp = winners[finalMs[1]] || null;
+  }
+  // Also consider earlier matches: if earlier match decides an obvious dominant team
+  // For a tracker this is good enough — users pick final matchday to set group outcomes
+
+  groupSlots[group] = { winner: gWinner, runnerUp: gRunnerUp };
+
+  // Now populate R32 slots for this group
+  Object.entries(groupR32Slots).forEach(([r32matchId, slots]) => {
+    const mid = parseInt(r32matchId);
+    ['home','away'].forEach(side => {
+      const def = slots[side];
+      if (!def) return;
+      if (def.type === 'winner' && def.group === group) {
+        if (gWinner) setKOSlot(mid, side, gWinner);
+        else clearKOSlot(mid, side);
+      } else if (def.type === 'runner-up' && def.group === group) {
+        if (gRunnerUp) setKOSlot(mid, side, gRunnerUp);
+        else clearKOSlot(mid, side);
+      }
+    });
+  });
+}
+
+// ─── PERSISTENCE ─────────────────────────────────────────────────────────────
+function saveState() {
+  try { localStorage.setItem('wc2026_winners', JSON.stringify(winners)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('wc2026_winners') || '{}');
+    // Replay in match order
+    const order = Object.keys(saved).map(Number).sort((a,b)=>a-b);
+    order.forEach(mid => {
+      const team = saved[mid];
+      const btns = document.querySelectorAll(`[data-match="${mid}"]`);
+      let opponent = null;
+      btns.forEach(b => { if(b.dataset.team !== team) opponent = b.dataset.team; });
+      if (team && opponent) pickWinner(mid, team, opponent);
+      else if (team) {
+        // KO match where opponent may be from slot
+        const home = document.getElementById(`m${mid}-home`);
+        const away = document.getElementById(`m${mid}-away`);
+        if (home && away) {
+          const h = home.dataset.team, a = away.dataset.team;
+          if (h && a) pickWinner(mid, team, team === h ? a : h);
+        }
+      }
+    });
+  } catch(e) {}
+}
+
+function resetAll() {
+  if (!confirm('Reset all picks?')) return;
+  // Clear all winner state
+  Object.keys(winners).forEach(k => delete winners[k]);
+  // Reset all group-stage buttons
+  document.querySelectorAll('.team-btn').forEach(b => {
+    b.classList.remove('winner','loser');
+    if (!b.classList.contains('tbd')) b.disabled = false;
+  });
+  // Reset all KO slots to defaults
+  for (let m = 73; m <= 104; m++) {
+    ['home','away'].forEach(s => clearKOSlot(m, s));
+  }
+  document.getElementById('champion-banner').classList.remove('visible');
+  'ABCDEFGHIJKL'.split('').forEach(g => groupSlots[g] = {winner:null, runnerUp:null});
+  try { localStorage.removeItem('wc2026_winners'); } catch(e) {}
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', loadState);
+</script>
+</body>
+</html>
