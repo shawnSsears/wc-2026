@@ -118,13 +118,58 @@
 
   /* RESPONSIVE */
   @media(max-width:700px){
-    .match{grid-template-columns:32px 52px 1fr}
-    .match-info{display:none}
+    .match{
+      grid-template-columns: 32px 52px 1fr;
+      grid-template-rows: auto auto;
+      row-gap: 4px;
+    }
+    .match-info{
+      grid-column: 2 / -1;
+      grid-row: 2;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      align-self: start;
+    }
+    .match-time{font-size:10px;white-space:nowrap;flex-shrink:0}
+    .match-venue{
+      font-size:10px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:none;
+      flex:1;
+    }
     .team-btn{font-size:12px;max-width:140px}
   }
   @media(max-width:480px){
-    .match{grid-template-columns:1fr}
-    .match-num{display:none}
+    .match{
+      grid-template-columns: 36px 1fr;
+      grid-template-rows: auto auto;
+      row-gap: 3px;
+    }
+    .match-num{
+      grid-row: 1;
+      font-size:9px;
+    }
+    .group-tag{
+      display:none;
+    }
+    .match-teams{
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .match-info{
+      grid-column: 2;
+      grid-row: 2;
+    }
+    .team-btn{font-size:12px;max-width:none}
+    .match-venue{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
   }
 
   footer{text-align:center;padding:32px 16px;border-top:1px solid rgba(255,255,255,.06);font-size:11px;color:var(--muted);font-family:'Roboto Mono',monospace;letter-spacing:1px}
