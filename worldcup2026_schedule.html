@@ -1273,7 +1273,7 @@ function pickWinner(matchId, team, opponent) {
     return;
   }
   // Set winner
-  winners[matchId] = team;
+  winners[String(matchId)] = team;
   renderMatch(matchId, team, opponent);
 
   // Propagate forward
@@ -1312,8 +1312,8 @@ function pickWinner(matchId, team, opponent) {
 }
 
 function clearWinner(matchId) {
-  delete winners[matchId];
-  delete scores[matchId];
+  delete winners[matchId]; delete winners[String(matchId)];
+  delete scores[matchId];  delete scores[String(matchId)];
   // Re-render match as unset
   const btns = document.querySelectorAll(`[data-match="${matchId}"]`);
   btns.forEach(b => {
@@ -1331,7 +1331,7 @@ function clearWinner(matchId) {
 function clearDownstream(matchId) {
   const rules = propagate[matchId] || [];
   rules.forEach(r => {
-    if (r.to && winners[r.to] !== undefined) clearWinner(r.to);
+    if (r.to && (winners[r.to] !== undefined || winners[String(r.to)] !== undefined)) clearWinner(r.to);
     // clear the slot even if no winner yet
     if (r.to) clearKOSlot(r.to, r.slot);
     if (r.loserTo) clearKOSlot(r.loserTo, r.loserSlot);
@@ -1368,7 +1368,7 @@ function showScoreRow(matchId, winner, loser) {
   // Find the winner button to insert after it
   const winnerBtn = matchEl.querySelector('.team-btn.winner');
   if (!winnerBtn) return;
-  const saved = scores[matchId] || {};
+  const saved = scores[String(matchId)] || scores[matchId] || {};
   const wGoals = saved.winnerGoals !== undefined ? saved.winnerGoals : '';
   const lGoals = saved.loserGoals  !== undefined ? saved.loserGoals  : '';
   // Build inline score element
@@ -1404,7 +1404,7 @@ function saveScore(matchId) {
   const wEl = document.getElementById('score-w-' + matchId);
   const lEl = document.getElementById('score-l-' + matchId);
   if (!wEl || !lEl) return;
-  scores[matchId] = { winnerGoals: wEl.value, loserGoals: lEl.value };
+  scores[String(matchId)] = { winnerGoals: wEl.value, loserGoals: lEl.value };
   saveState();
   renderStandings();
 }
@@ -1600,8 +1600,12 @@ function getPayload() {
 
 function applyPayload(data) {
   if (!data) return;
-  var w = data.winners || {};
-  var s = data.scores  || {};
+  // Normalize all keys to strings (Firebase returns string keys, local may use numbers)
+  var rawW = data.winners || {};
+  var rawS = data.scores  || {};
+  var w = {}, s = {};
+  Object.keys(rawW).forEach(function(k) { if (rawW[k]) w[String(k)] = rawW[k]; });
+  Object.keys(rawS).forEach(function(k) { s[String(k)] = rawS[k]; });
   var wasSyncing = isSyncing;
   isSyncing = true;
 
@@ -1857,25 +1861,43 @@ function computeGroupStandings(group) {
   });
 
   allGroupMatches[group].forEach(function(mid) {
-    var w = winners[mid];
+    // Always use string keys — Firebase and JSON.parse return string keys
+    var midStr = String(mid);
+    var w = winners[midStr] || winners[mid];
     if (!w) return; // match not decided
     var parts = matchParticipants[mid];
     if (!parts) return;
-    var home = normTeam(parts[0]);
-    var away = normTeam(parts[1]);
+    var home    = normTeam(parts[0]);
+    var away    = normTeam(parts[1]);
     var winnerN = normTeam(w);
-    var loserN = winnerN === home ? away : home;
+    var loserN  = winnerN === home ? away : home;
 
-    // Get scores
-    var sc = scores[mid] || {};
-    var wg = sc.winnerGoals !== undefined && sc.winnerGoals !== '' ? parseInt(sc.winnerGoals) : null;
-    var lg = sc.loserGoals  !== undefined && sc.loserGoals  !== '' ? parseInt(sc.loserGoals)  : null;
+    // Score lookup — try both string and number keys
+    var sc = scores[midStr] || scores[mid] || {};
+    var wg = (sc.winnerGoals !== undefined && sc.winnerGoals !== '') ? parseInt(sc.winnerGoals, 10) : null;
+    var lg = (sc.loserGoals  !== undefined && sc.loserGoals  !== '') ? parseInt(sc.loserGoals,  10) : null;
     var hasScore = wg !== null && lg !== null && !isNaN(wg) && !isNaN(lg);
 
-    // Find canonical team entries
-    var winnerEntry = teams[winnerN];
-    var loserEntry  = teams[loserN];
-    if (!winnerEntry || !loserEntry) return;
+    // Find canonical team entries — try exact name then fall back to normTeam match
+    var winnerEntry = teams[winnerN] || teams[normTeam(winnerN)];
+    var loserEntry  = teams[loserN]  || teams[normTeam(loserN)];
+
+    // Last-resort fuzzy match if normTeam didn't fully resolve
+    if (!winnerEntry) {
+      Object.keys(teams).forEach(function(k) {
+        if (normTeam(k) === winnerN) winnerEntry = teams[k];
+      });
+    }
+    if (!loserEntry) {
+      Object.keys(teams).forEach(function(k) {
+        if (normTeam(k) === loserN) loserEntry = teams[k];
+      });
+    }
+
+    if (!winnerEntry || !loserEntry) {
+      console.warn('Could not find team entries for match', mid, '| winner:', winnerN, '| loser:', loserN, '| teams:', Object.keys(teams));
+      return;
+    }
 
     winnerEntry.mp++;
     loserEntry.mp++;
